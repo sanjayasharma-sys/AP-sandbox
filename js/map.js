@@ -104,11 +104,63 @@ function initMap() {
     attributionControl: false
   });
 
-  // Standard OpenStreetMap tiles (light mode)
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+  // ---- Base maps ----
+  const streetLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-  }).addTo(map);
+  });
+
+  const satelliteLayer = L.tileLayer(
+    "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+    {
+      maxZoom: 19,
+      attribution: "Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics"
+    }
+  );
+
+  const darkLayer = L.tileLayer(
+    "https://{s}.basemaps-cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",
+    {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>'
+    }
+  );
+
+  // Add default basemap (Street)
+  streetLayer.addTo(map);
+
+  // ---- Overlay layers (off by default) ----
+  const sentinel2Layer = L.tileLayer(
+    "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/MODIS_Terra_CorrectedReflectance_TrueColor/default/2026-03-30/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg",
+    {
+      maxZoom: 9,
+      opacity: 0.7,
+      attribution: "Imagery courtesy of NASA GIBS"
+    }
+  );
+
+  const viirsLayer = L.tileLayer(
+    "https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_DayNightBand_At_Sensor_Radiance/default/2026-03-30/GoogleMapsCompatible_Level8/{z}/{y}/{x}.png",
+    {
+      maxZoom: 8,
+      opacity: 0.75,
+      attribution: "Imagery courtesy of NASA GIBS / VIIRS"
+    }
+  );
+
+  // ---- Layer control ----
+  const baseMaps = {
+    "Street": streetLayer,
+    "Satellite": satelliteLayer,
+    "Dark": darkLayer
+  };
+
+  const overlayMaps = {
+    "Sentinel-2 Optical": sentinel2Layer,
+    "VIIRS Night Lights": viirsLayer
+  };
+
+  L.control.layers(baseMaps, overlayMaps, { position: "topright", collapsed: true }).addTo(map);
 
   // Zoom control on topright
   L.control.zoom({ position: "topright" }).addTo(map);
@@ -345,4 +397,105 @@ function createLegendControl() {
   });
 
   return new LegendControl();
+}
+
+// ============ SAR CORRELATION ============
+
+let sarCorrelationLayer = null;
+
+function showSARCorrelation() {
+  // Clear any existing SAR layer first
+  clearSARCorrelation();
+
+  const vessels = window.appState.vessels || [];
+  const elements = [];
+
+  // SAR swath rectangle covering the strait area
+  const swath = L.rectangle(
+    [[25.0, 54.0], [27.5, 58.0]],
+    {
+      color: "#4A90D9",
+      weight: 1.5,
+      opacity: 0.6,
+      fillColor: "#4A90D9",
+      fillOpacity: 0.08,
+      dashArray: "6 4",
+      className: "sar-swath"
+    }
+  );
+  elements.push(swath);
+
+  // Detection boxes for each vessel within the swath bounds
+  const swathBounds = L.latLngBounds([25.0, 54.0], [27.5, 58.0]);
+  const halfBox = 0.01; // 0.02 degrees wide total
+
+  vessels.forEach(vessel => {
+    const pos = L.latLng(vessel.lat, vessel.lng);
+    if (!swathBounds.contains(pos)) return;
+
+    const mode = vessel.trackingMode || "cooperative";
+    const isMatched = mode === "cooperative";
+    const isUnmatched = mode === "dark" || mode === "gone_dark";
+
+    if (!isMatched && !isUnmatched) return;
+
+    const boxColor = isMatched ? "#22C55E" : "#EF4444";
+    const labelText = isMatched ? "MATCHED" : "DARK";
+
+    const box = L.rectangle(
+      [
+        [vessel.lat - halfBox, vessel.lng - halfBox],
+        [vessel.lat + halfBox, vessel.lng + halfBox]
+      ],
+      {
+        color: boxColor,
+        weight: 2,
+        opacity: 0.9,
+        fillColor: boxColor,
+        fillOpacity: 0.12,
+        className: "sar-detection-box"
+      }
+    );
+
+    box.bindTooltip(
+      `<div class="sar-tooltip"><strong>${vessel.name || "UNKNOWN"}</strong><br><span style="color:${boxColor}">${labelText}</span></div>`,
+      { className: "dark-tooltip", direction: "top", offset: [0, -4] }
+    );
+
+    elements.push(box);
+
+    // Label marker
+    const labelIcon = L.divIcon({
+      html: `<div class="sar-pass-label" style="color:${boxColor}">${labelText}</div>`,
+      className: "",
+      iconSize: null,
+      iconAnchor: [0, 0]
+    });
+
+    const labelMarker = L.marker(
+      [vessel.lat + halfBox + 0.005, vessel.lng],
+      { icon: labelIcon, interactive: false }
+    );
+    elements.push(labelMarker);
+  });
+
+  // Timestamp label — positioned at top of swath
+  const timestampIcon = L.divIcon({
+    html: `<div class="sar-pass-label sar-pass-timestamp">SAR PASS: ICEYE-X7 | 2026-03-31 06:45:00Z</div>`,
+    className: "",
+    iconSize: null,
+    iconAnchor: [0, 0]
+  });
+  const timestampMarker = L.marker([27.45, 54.05], { icon: timestampIcon, interactive: false });
+  elements.push(timestampMarker);
+
+  // Build layer group and add to map
+  sarCorrelationLayer = L.layerGroup(elements).addTo(map);
+}
+
+function clearSARCorrelation() {
+  if (sarCorrelationLayer) {
+    map.removeLayer(sarCorrelationLayer);
+    sarCorrelationLayer = null;
+  }
 }

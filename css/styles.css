@@ -832,3 +832,93 @@ html, body {
   .main-layout { height: calc(100vh - var(--navbar-height) - var(--bottombar-height) - 48px); }
   .bottombar { display: none; }
 }
+
+/* ========== SAR CORRELATION ========== */
+.sar-correlate-btn {
+  width: 100%; padding: 10px;
+  background: var(--ulook-orange); color: white;
+  border: none; border-radius: 6px;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer; transition: background 0.2s;
+  letter-spacing: 0.5px;
+}
+.sar-correlate-btn:hover { background: var(--ulook-orange-light); }
+.sar-correlate-btn.active {
+  background: #1d4ed8;
+  border: 1px solid #3b82f6;
+}
+.sar-correlate-btn.active:hover { background: #2563eb; }
+
+.sar-pass-info {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+  margin-top: 6px;
+  min-height: 14px;
+  letter-spacing: 0.5px;
+}
+
+.sar-detection-box {
+  /* Leaflet rectangle styling handled inline; this class is a hook */
+}
+
+.sar-swath {
+  /* Leaflet rectangle styling handled inline */
+}
+
+.sar-pass-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  background: rgba(8, 14, 26, 0.82);
+  border: 1px solid currentColor;
+  padding: 2px 5px;
+  border-radius: 3px;
+  pointer-events: none;
+}
+
+.sar-pass-timestamp {
+  font-size: 11px;
+  color: #4A90D9 !important;
+  border-color: #4A90D9 !important;
+}
+
+/* ========== LEAFLET LAYER CONTROL — DARK THEME ========== */
+.leaflet-control-layers {
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important;
+}
+.leaflet-control-layers-toggle {
+  background-color: var(--bg-secondary) !important;
+}
+.leaflet-control-layers-expanded {
+  padding: 8px 12px !important;
+  font-size: 12px !important;
+  min-width: 160px;
+}
+.leaflet-control-layers-separator {
+  border-top: 1px solid var(--border) !important;
+  margin: 6px 0 !important;
+}
+.leaflet-control-layers label {
+  color: var(--text-primary) !important;
+  font-family: var(--font-sans);
+  font-size: 12px;
+  padding: 3px 0;
+}
+.leaflet-control-layers-base,
+.leaflet-control-layers-overlays {
+  color: var(--text-secondary) !important;
+}
+.leaflet-control-layers-list {
+  margin-bottom: 0 !important;
+}
+.leaflet-control-layers input[type="radio"],
+.leaflet-control-layers input[type="checkbox"] {
+  accent-color: var(--ulook-orange);
+}

@@ -77,6 +77,31 @@ function initToolbar() {
   document.querySelectorAll(".panel-close").forEach(btn => {
     btn.addEventListener("click", closeActivePanel);
   });
+
+  // SAR correlation toggle
+  const sarBtn = document.getElementById("sar-correlate-btn");
+  const sarInfo = document.getElementById("sar-pass-info");
+  let sarActive = false;
+
+  if (sarBtn) {
+    sarBtn.addEventListener("click", () => {
+      sarActive = !sarActive;
+      if (sarActive) {
+        showSARCorrelation();
+        sarBtn.textContent = "Clear SAR Pass";
+        sarBtn.classList.add("active");
+        if (sarInfo) {
+          sarInfo.textContent = "ICEYE-X7 | 2026-03-31 06:45:00Z";
+          sarInfo.style.color = "#4A90D9";
+        }
+      } else {
+        clearSARCorrelation();
+        sarBtn.textContent = "Simulate SAR Pass";
+        sarBtn.classList.remove("active");
+        if (sarInfo) sarInfo.textContent = "";
+      }
+    });
+  }
 }
 
 function openPanel(panelId) {
