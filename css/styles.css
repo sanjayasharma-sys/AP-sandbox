@@ -137,15 +137,16 @@ html, body {
 
 /* ========== SLIDE PANEL ========== */
 .slide-panel {
-  position: absolute;
+  position: fixed;
   left: var(--toolbar-width);
-  top: 0; bottom: 0;
+  top: var(--navbar-height);
+  bottom: var(--bottombar-height);
   width: var(--slide-panel-width);
   background: var(--bg-secondary);
   border-right: 1px solid var(--border);
   transform: translateX(-120%);
   transition: transform 0.25s ease;
-  z-index: 90;
+  z-index: 150;
   display: flex; flex-direction: column;
   overflow: hidden;
 }
@@ -382,10 +383,11 @@ html, body {
 /* ========== FLOATING LEGEND ========== */
 .floating-legend {
   position: absolute; bottom: 24px; left: 12px;
-  background: rgba(12, 20, 36, 0.92);
-  border: 1px solid var(--border); border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #d0d5dd; border-radius: 8px;
   padding: 10px 14px; z-index: 50;
   font-size: 11px; backdrop-filter: blur(8px);
+  color: #1a1a2e; box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
 
 .fl-row { display: flex; align-items: center; gap: 8px; padding: 3px 0; }
@@ -407,17 +409,7 @@ html, body {
 #map-container { width: 100%; height: 100%; background: var(--bg-primary); }
 
 /* Leaflet overrides */
-.leaflet-control-zoom a {
-  background: var(--bg-secondary) !important;
-  color: var(--text-primary) !important;
-  border-color: var(--border) !important;
-}
-.leaflet-control-zoom a:hover { background: var(--bg-tertiary) !important; }
-.leaflet-control-attribution {
-  background: rgba(8, 14, 26, 0.8) !important;
-  color: var(--text-muted) !important; font-size: 9px !important;
-}
-.leaflet-control-attribution a { color: var(--text-secondary) !important; }
+.leaflet-control-attribution { font-size: 9px !important; }
 
 /* ========== MARKERS ========== */
 .vessel-marker {
@@ -446,7 +438,15 @@ html, body {
   font-size: 12px !important;
   box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
 }
-.dark-tooltip::before { border-top-color: var(--border) !important; }
+.dark-tooltip .leaflet-tooltip-tip { display: none; }
+
+/* Leaflet zoom controls on light map */
+.leaflet-control-zoom a {
+  background: white !important;
+  color: #333 !important;
+  border-color: #ccc !important;
+}
+.leaflet-control-zoom a:hover { background: #f0f0f0 !important; }
 
 .vessel-tooltip strong { font-size: 13px; }
 
@@ -670,14 +670,15 @@ html, body {
 
 /* ========== LEAFLET LEGEND CONTROL ========== */
 .leaflet-legend-control {
-  background: rgba(12, 20, 36, 0.92);
-  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #d0d5dd;
   border-radius: 8px;
   padding: 10px 14px;
   font-size: 11px;
-  color: var(--text-primary);
+  color: #1a1a2e;
   backdrop-filter: blur(8px);
   font-family: var(--font-sans);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
 .legend-compact { display: flex; flex-direction: column; gap: 3px; }

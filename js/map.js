@@ -26,8 +26,8 @@ function createMarkerIcon(vessel) {
     strokeWidth = 2;
     strokeDash = ' stroke-dasharray="4 2"';
   } else {
-    stroke = "#ffffff";
-    strokeWidth = 1;
+    stroke = "#1a1a1a";
+    strokeWidth = 1.5;
     strokeDash = "";
   }
 
@@ -104,10 +104,10 @@ function initMap() {
     attributionControl: false
   });
 
-  // Dark tile layer
-  L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+  // Standard OpenStreetMap tiles (light mode)
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     maxZoom: 19,
-    attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright">OSM</a>'
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
   }).addTo(map);
 
   // Zoom control on topright
