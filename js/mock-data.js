@@ -60,7 +60,13 @@ function generateScenarioData() {
         }
       ],
       alerts: [],
-      trackHistory: generateTrack(25.72, 56.42, 285, 11.8, now, 8),
+      trackHistory: [
+        { lat: 25.30, lng: 56.85, timestamp: new Date(now.getTime() - 4*3600000).toISOString(), speed: 12.0 },
+        { lat: 25.40, lng: 56.75, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 11.9 },
+        { lat: 25.50, lng: 56.65, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 11.5 },
+        { lat: 25.60, lng: 56.55, timestamp: new Date(now.getTime() - 1*3600000).toISOString(), speed: 11.8 },
+        { lat: 25.72, lng: 56.42, timestamp: now.toISOString(), speed: 11.8 }
+      ],
       portHistory: [
         { port: "Fujairah", arrived: "2026-03-28T08:00:00Z", departed: "2026-03-30T14:00:00Z" },
         { port: "Jebel Ali", arrived: "2026-03-24T06:00:00Z", departed: "2026-03-27T10:00:00Z" }
@@ -95,7 +101,13 @@ function generateScenarioData() {
       },
       imagery: [],
       alerts: [],
-      trackHistory: generateTrack(26.48, 55.15, 118, 14.2, now, 8),
+      trackHistory: [
+        { lat: 26.80, lng: 54.20, timestamp: new Date(now.getTime() - 4*3600000).toISOString(), speed: 14.0 },
+        { lat: 26.72, lng: 54.50, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 14.3 },
+        { lat: 26.65, lng: 54.75, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 14.1 },
+        { lat: 26.55, lng: 55.00, timestamp: new Date(now.getTime() - 1*3600000).toISOString(), speed: 14.2 },
+        { lat: 26.48, lng: 55.15, timestamp: now.toISOString(), speed: 14.2 }
+      ],
       portHistory: [
         { port: "Dammam", arrived: "2026-03-26T12:00:00Z", departed: "2026-03-30T06:00:00Z" }
       ],
@@ -165,7 +177,12 @@ function generateScenarioData() {
           timestamp: new Date(now.getTime() - 600000).toISOString()
         }
       ],
-      trackHistory: generateTrack(26.31, 56.68, 195, 8.5, now, 6),
+      trackHistory: [
+        { lat: 26.55, lng: 56.55, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 8.8 },
+        { lat: 26.48, lng: 56.58, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 8.6 },
+        { lat: 26.40, lng: 56.62, timestamp: new Date(now.getTime() - 1*3600000).toISOString(), speed: 8.5 },
+        { lat: 26.31, lng: 56.68, timestamp: now.toISOString(), speed: 8.5 }
+      ],
       portHistory: [],
       lastUpdate: now.toISOString(),
       firstDetected: "2026-03-31T03:00:00Z"
@@ -254,7 +271,12 @@ function generateScenarioData() {
           timestamp: new Date(now.getTime() - 1200000).toISOString()
         }
       ],
-      trackHistory: generateTrack(25.82, 56.78, 210, 6.2, now, 6),
+      trackHistory: [
+        { lat: 26.10, lng: 56.60, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 6.5 },
+        { lat: 26.00, lng: 56.65, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 6.3 },
+        { lat: 25.90, lng: 56.72, timestamp: new Date(now.getTime() - 1*3600000).toISOString(), speed: 6.2 },
+        { lat: 25.82, lng: 56.78, timestamp: now.toISOString(), speed: 6.2 }
+      ],
       portHistory: [],
       lastUpdate: now.toISOString(),
       firstDetected: "2026-03-30T22:00:00Z"
@@ -270,11 +292,11 @@ function generateScenarioData() {
       imo: "IMO9345678",
       flag: "PA",
       callsign: "3FXK7",
-      lat: 26.85,
-      lng: 56.02,
-      course: 45.0,
+      lat: 26.60,
+      lng: 56.70,
+      course: 55.0,
       speed: 10.1,
-      heading: 43,
+      heading: 53,
       destination: "BANDAR ABBAS",
       navStatus: "underway",
       draught: 9.4,
@@ -282,7 +304,7 @@ function generateScenarioData() {
       ais: {
         active: false,
         lastSeen: new Date(now.getTime() - 6 * 3600000).toISOString(),
-        lastPosition: { lat: 26.55, lng: 55.72 }
+        lastPosition: { lat: 26.15, lng: 56.25 }
       },
       rf: {
         detected: true,
@@ -327,18 +349,18 @@ function generateScenarioData() {
         }
       ],
       trackHistory: [
-        // Before going dark (AIS positions)
-        { lat: 26.20, lng: 55.30, timestamp: new Date(now.getTime() - 10 * 3600000).toISOString(), speed: 12.0 },
-        { lat: 26.28, lng: 55.38, timestamp: new Date(now.getTime() - 9 * 3600000).toISOString(), speed: 11.5 },
-        { lat: 26.36, lng: 55.48, timestamp: new Date(now.getTime() - 8 * 3600000).toISOString(), speed: 11.8 },
-        { lat: 26.44, lng: 55.58, timestamp: new Date(now.getTime() - 7 * 3600000).toISOString(), speed: 11.2 },
-        // Last AIS position
-        { lat: 26.55, lng: 55.72, timestamp: new Date(now.getTime() - 6 * 3600000).toISOString(), speed: 10.8 },
-        // RF-only positions (after going dark)
-        { lat: 26.62, lng: 55.80, timestamp: new Date(now.getTime() - 5 * 3600000).toISOString(), speed: 10.5 },
-        { lat: 26.70, lng: 55.88, timestamp: new Date(now.getTime() - 4 * 3600000).toISOString(), speed: 10.3 },
-        { lat: 26.78, lng: 55.95, timestamp: new Date(now.getTime() - 2 * 3600000).toISOString(), speed: 10.0 },
-        { lat: 26.85, lng: 56.02, timestamp: now.toISOString(), speed: 10.1 }
+        // Before going dark (AIS positions) — following shipping lane
+        { lat: 26.20, lng: 55.30, timestamp: new Date(now.getTime() - 10*3600000).toISOString(), speed: 12.0 },
+        { lat: 26.18, lng: 55.55, timestamp: new Date(now.getTime() - 9*3600000).toISOString(), speed: 11.5 },
+        { lat: 26.15, lng: 55.80, timestamp: new Date(now.getTime() - 8*3600000).toISOString(), speed: 11.8 },
+        { lat: 26.12, lng: 56.05, timestamp: new Date(now.getTime() - 7*3600000).toISOString(), speed: 11.2 },
+        // Last AIS position — entering Strait of Hormuz
+        { lat: 26.15, lng: 56.25, timestamp: new Date(now.getTime() - 6*3600000).toISOString(), speed: 10.8 },
+        // RF-only positions (after going dark) — continuing east through strait
+        { lat: 26.20, lng: 56.40, timestamp: new Date(now.getTime() - 5*3600000).toISOString(), speed: 10.5 },
+        { lat: 26.30, lng: 56.55, timestamp: new Date(now.getTime() - 4*3600000).toISOString(), speed: 10.3 },
+        { lat: 26.50, lng: 56.60, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 10.0 },
+        { lat: 26.60, lng: 56.70, timestamp: now.toISOString(), speed: 10.1 }
       ],
       portHistory: [
         { port: "Jebel Ali", arrived: "2026-03-27T10:00:00Z", departed: "2026-03-30T18:00:00Z" }
