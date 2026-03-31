@@ -1,48 +1,54 @@
-// Utility functions for Maritime Domain Awareness Dashboard
+// Utility functions and constants for uLook Maritime Intelligence Dashboard
 
-const SOURCE_COLORS = {
-  ais: "#00d4aa",
-  rf: "#f0a030",
-  satellite: "#4a9eff"
+// ============ TRACKING MODE CONFIG ============
+const TRACKING_MODES = {
+  cooperative: { label: "Cooperative", sublabel: "AIS Active", color: "#22C55E", glowColor: null },
+  dark:        { label: "Dark Vessel", sublabel: "RF Only", color: "#E8461E", glowColor: "#E8461E" },
+  gone_dark:   { label: "Gone Dark", sublabel: "AIS Lost", color: "#F59E0B", glowColor: "#F59E0B" }
 };
 
-const SOURCE_LABELS = {
-  ais: "AIS Transponder",
-  rf: "RF Emissions",
-  satellite: "Satellite Imagery"
+// ============ VESSEL CLASS CONFIG ============
+const VESSEL_CLASSES = {
+  cargo:     { label: "Cargo",     color: "#3B82F6", shape: "chevron" },
+  tanker:    { label: "Tanker",    color: "#8B5CF6", shape: "diamond" },
+  fishing:   { label: "Fishing",   color: "#06B6D4", shape: "circle" },
+  military:  { label: "Military",  color: "#EF4444", shape: "triangle" },
+  passenger: { label: "Passenger", color: "#10B981", shape: "rounded-rect" },
+  unknown:   { label: "Unknown",   color: "#6B7280", shape: "dashed-diamond" }
 };
 
-const SOURCE_ICONS = {
-  ais: "ais-vessel",
-  rf: "rf-emitter",
-  satellite: "sat-detection"
-};
-
+// ============ SEVERITY COLORS ============
 const SEVERITY_COLORS = {
-  critical: "#ff3b5c",
-  warning: "#f0a030",
-  caution: "#ffd700",
-  info: "#4a9eff"
+  critical: "#EF4444",
+  warning: "#F59E0B",
+  info: "#3B82F6"
 };
 
-const VESSEL_TYPE_LABELS = {
-  cargo: "Cargo",
-  tanker: "Tanker",
-  fishing: "Fishing",
-  container: "Container",
-  bulk_carrier: "Bulk Carrier",
-  passenger: "Passenger",
-  military: "Military",
-  tug: "Tug",
-  unknown: "Unknown"
-};
-
+// ============ FLAG DATA ============
 const FLAG_NAMES = {
   SG: "Singapore", CN: "China", JP: "Japan", KR: "South Korea",
   PH: "Philippines", VN: "Vietnam", MY: "Malaysia", ID: "Indonesia",
   TW: "Taiwan", HK: "Hong Kong", PA: "Panama", LR: "Liberia",
-  MH: "Marshall Islands", BS: "Bahamas", GR: "Greece", NO: "Norway"
+  MH: "Marshall Islands", BS: "Bahamas", GR: "Greece", NO: "Norway",
+  IR: "Iran", OM: "Oman", AE: "UAE", BH: "Bahrain",
+  KW: "Kuwait", QA: "Qatar", SA: "Saudi Arabia", IQ: "Iraq",
+  IN: "India", PK: "Pakistan", US: "United States", GB: "United Kingdom",
+  TR: "Turkey", MT: "Malta", CY: "Cyprus", DK: "Denmark"
 };
+
+// ============ RF EMITTER TYPES ============
+const EMITTER_TYPES = {
+  "x-band-nav":  { label: "X-band Navigation Radar", band: "X-band", freqRange: "9.2–9.5 GHz" },
+  "s-band-radar": { label: "S-band Surface Search Radar", band: "S-band", freqRange: "2.9–3.1 GHz" },
+  "ku-vsat":     { label: "Ku-band VSAT Terminal", band: "Ku-band", freqRange: "14.0–14.5 GHz" },
+  "vhf-marine":  { label: "VHF Marine Radio", band: "VHF", freqRange: "156–162 MHz" },
+  "l-satphone":  { label: "L-band Satphone", band: "L-band", freqRange: "1.616–1.627 GHz" },
+  "ka-vsat":     { label: "Ka-band VSAT Terminal", band: "Ka-band", freqRange: "27.5–30.0 GHz" },
+  "ais-tx":      { label: "AIS Transponder", band: "VHF", freqRange: "161.975–162.025 MHz" },
+  "military-radar": { label: "Military Fire Control Radar", band: "X-band", freqRange: "8.5–10.5 GHz" }
+};
+
+// ============ FORMATTING FUNCTIONS ============
 
 function formatCoord(lat, lng) {
   function toDMS(val, posChar, negChar) {
@@ -70,12 +76,19 @@ function timeAgo(timestamp) {
   return `${days}d ${hours % 24}h ago`;
 }
 
-function getSourceColor(source) {
-  return SOURCE_COLORS[source] || "#888";
+function formatFrequency(mhz) {
+  if (mhz >= 1000) return `${(mhz / 1000).toFixed(2)} GHz`;
+  return `${mhz.toFixed(1)} MHz`;
 }
 
-function getSourceLabel(source) {
-  return SOURCE_LABELS[source] || source;
+function formatSpeed(speed) {
+  if (speed === undefined || speed === null) return "N/A";
+  return `${speed.toFixed(1)} kn`;
+}
+
+function formatCourse(course) {
+  if (course === undefined || course === null) return "N/A";
+  return `${course.toFixed(1)}\u00B0`;
 }
 
 function knotsToKmh(knots) {
@@ -87,25 +100,43 @@ function flagEmoji(code) {
   return String.fromCodePoint(...[...code.toUpperCase()].map(c => 0x1F1E6 + c.charCodeAt(0) - 65));
 }
 
+function getTrackingModeColor(mode) {
+  return (TRACKING_MODES[mode] || TRACKING_MODES.cooperative).color;
+}
+
+function getTrackingModeLabel(mode) {
+  return (TRACKING_MODES[mode] || TRACKING_MODES.cooperative).label;
+}
+
+function getVesselClassColor(cls) {
+  return (VESSEL_CLASSES[cls] || VESSEL_CLASSES.unknown).color;
+}
+
+function getVesselClassLabel(cls) {
+  return (VESSEL_CLASSES[cls] || VESSEL_CLASSES.unknown).label;
+}
+
 function getVesselDisplayName(vessel) {
   if (vessel.name) return vessel.name;
-  if (vessel.emitterId) return `RF: ${vessel.emitterId}`;
-  if (vessel.satellite) return `SAT: ${vessel.id}`;
-  return vessel.id;
+  if (vessel.rf && vessel.rf.emitters && vessel.rf.emitters.length > 0) {
+    return `RF: ${vessel.rf.emitters[0].fingerprintId}`;
+  }
+  return `Unknown [${vessel.id}]`;
 }
 
-function getCorrelatedSources(vessel, correlationGroups) {
-  const group = correlationGroups[vessel.correlationId];
-  if (!group || group.length <= 1) return [vessel.source];
-  return [...new Set(group.map(v => v.source))];
+function getEmitterTypeLabel(type) {
+  return (EMITTER_TYPES[type] || { label: type }).label;
 }
 
-function formatSpeed(speed) {
-  if (speed === undefined || speed === null) return "N/A";
-  return `${speed.toFixed(1)} kn`;
+function signalStrengthPercent(dbm) {
+  // Map -30 (strong) to -100 (weak) → 100% to 0%
+  return Math.max(0, Math.min(100, ((dbm + 100) / 70) * 100));
 }
 
-function formatCourse(course) {
-  if (course === undefined || course === null) return "N/A";
-  return `${course.toFixed(1)}\u00B0`;
+function debounce(fn, ms) {
+  let timer;
+  return function (...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), ms);
+  };
 }
