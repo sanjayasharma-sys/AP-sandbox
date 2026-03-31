@@ -125,8 +125,8 @@ function generateScenarioData() {
       imo: null,
       flag: null,
       callsign: null,
-      lat: 26.31,
-      lng: 56.68,
+      lat: 26.05,
+      lng: 57.15,
       course: 195.0,
       speed: 8.5,
       heading: null,
@@ -178,10 +178,10 @@ function generateScenarioData() {
         }
       ],
       trackHistory: [
-        { lat: 26.55, lng: 56.55, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 8.8 },
-        { lat: 26.48, lng: 56.58, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 8.6 },
-        { lat: 26.40, lng: 56.62, timestamp: new Date(now.getTime() - 1*3600000).toISOString(), speed: 8.5 },
-        { lat: 26.31, lng: 56.68, timestamp: now.toISOString(), speed: 8.5 }
+        { lat: 26.30, lng: 57.00, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 8.8 },
+        { lat: 26.22, lng: 57.05, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 8.6 },
+        { lat: 26.12, lng: 57.10, timestamp: new Date(now.getTime() - 1*3600000).toISOString(), speed: 8.5 },
+        { lat: 26.05, lng: 57.15, timestamp: now.toISOString(), speed: 8.5 }
       ],
       portHistory: [],
       lastUpdate: now.toISOString(),
@@ -196,8 +196,8 @@ function generateScenarioData() {
       imo: null,
       flag: null,
       callsign: null,
-      lat: 25.82,
-      lng: 56.78,
+      lat: 25.45,
+      lng: 57.25,
       course: 210.0,
       speed: 6.2,
       heading: null,
@@ -272,10 +272,10 @@ function generateScenarioData() {
         }
       ],
       trackHistory: [
-        { lat: 26.10, lng: 56.60, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 6.5 },
-        { lat: 26.00, lng: 56.65, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 6.3 },
-        { lat: 25.90, lng: 56.72, timestamp: new Date(now.getTime() - 1*3600000).toISOString(), speed: 6.2 },
-        { lat: 25.82, lng: 56.78, timestamp: now.toISOString(), speed: 6.2 }
+        { lat: 25.70, lng: 57.10, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 6.5 },
+        { lat: 25.62, lng: 57.15, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 6.3 },
+        { lat: 25.52, lng: 57.20, timestamp: new Date(now.getTime() - 1*3600000).toISOString(), speed: 6.2 },
+        { lat: 25.45, lng: 57.25, timestamp: now.toISOString(), speed: 6.2 }
       ],
       portHistory: [],
       lastUpdate: now.toISOString(),
@@ -292,8 +292,8 @@ function generateScenarioData() {
       imo: "IMO9345678",
       flag: "PA",
       callsign: "3FXK7",
-      lat: 26.60,
-      lng: 56.70,
+      lat: 26.68,
+      lng: 57.00,
       course: 55.0,
       speed: 10.1,
       heading: 53,
@@ -304,7 +304,7 @@ function generateScenarioData() {
       ais: {
         active: false,
         lastSeen: new Date(now.getTime() - 6 * 3600000).toISOString(),
-        lastPosition: { lat: 26.55, lng: 56.28 }
+        lastPosition: { lat: 26.58, lng: 56.50 }
       },
       rf: {
         detected: true,
@@ -413,17 +413,17 @@ function generateScenarioData() {
       ],
       trackHistory: [
         // Before going dark (AIS positions) — following shipping lane north of Musandam
-        { lat: 26.30, lng: 55.30, timestamp: new Date(now.getTime() - 10*3600000).toISOString(), speed: 12.0 },
-        { lat: 26.38, lng: 55.55, timestamp: new Date(now.getTime() - 9*3600000).toISOString(), speed: 11.5 },
-        { lat: 26.45, lng: 55.80, timestamp: new Date(now.getTime() - 8*3600000).toISOString(), speed: 11.8 },
-        { lat: 26.50, lng: 56.05, timestamp: new Date(now.getTime() - 7*3600000).toISOString(), speed: 11.2 },
+        { lat: 26.40, lng: 55.30, timestamp: new Date(now.getTime() - 10*3600000).toISOString(), speed: 12.0 },
+        { lat: 26.45, lng: 55.55, timestamp: new Date(now.getTime() - 9*3600000).toISOString(), speed: 11.5 },
+        { lat: 26.50, lng: 55.80, timestamp: new Date(now.getTime() - 8*3600000).toISOString(), speed: 11.8 },
+        { lat: 26.55, lng: 56.05, timestamp: new Date(now.getTime() - 7*3600000).toISOString(), speed: 11.2 },
         // Last AIS position — in the TSS north of Musandam Peninsula
-        { lat: 26.55, lng: 56.28, timestamp: new Date(now.getTime() - 6*3600000).toISOString(), speed: 10.8 },
-        // RF-only positions (after going dark) — continuing northeast through strait
-        { lat: 26.58, lng: 56.42, timestamp: new Date(now.getTime() - 5*3600000).toISOString(), speed: 10.5 },
-        { lat: 26.60, lng: 56.55, timestamp: new Date(now.getTime() - 4*3600000).toISOString(), speed: 10.3 },
-        { lat: 26.60, lng: 56.63, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 10.0 },
-        { lat: 26.60, lng: 56.70, timestamp: now.toISOString(), speed: 10.1 }
+        { lat: 26.58, lng: 56.50, timestamp: new Date(now.getTime() - 6*3600000).toISOString(), speed: 10.8 },
+        // RF-only positions (after going dark) — continuing northeast through strait, north of Musandam
+        { lat: 26.62, lng: 56.60, timestamp: new Date(now.getTime() - 5*3600000).toISOString(), speed: 10.5 },
+        { lat: 26.65, lng: 56.72, timestamp: new Date(now.getTime() - 4*3600000).toISOString(), speed: 10.3 },
+        { lat: 26.67, lng: 56.85, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 10.0 },
+        { lat: 26.68, lng: 57.00, timestamp: now.toISOString(), speed: 10.1 }
       ],
       portHistory: [
         { port: "Jebel Ali", arrived: "2026-03-27T10:00:00Z", departed: "2026-03-30T18:00:00Z" }
@@ -552,11 +552,11 @@ function generateScenarioData() {
       imo: "IMO9694094",
       flag: "MT",
       callsign: "9HJQ9",
-      lat: 26.70,
-      lng: 56.90,
-      course: 240.0,
+      lat: 25.60,
+      lng: 57.50,
+      course: 280.0,
       speed: 12.6,
-      heading: 238,
+      heading: 278,
       destination: "FUJAIRAH",
       navStatus: "underway",
       draught: 15.1,
@@ -574,11 +574,11 @@ function generateScenarioData() {
       imagery: [],
       alerts: [],
       trackHistory: [
-        { lat: 26.55, lng: 57.50, timestamp: new Date(now.getTime() - 4*3600000).toISOString(), speed: 12.8 },
-        { lat: 26.60, lng: 57.30, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 12.5 },
-        { lat: 26.62, lng: 57.15, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 12.7 },
-        { lat: 26.66, lng: 57.02, timestamp: new Date(now.getTime() - 1*3600000).toISOString(), speed: 12.6 },
-        { lat: 26.70, lng: 56.90, timestamp: now.toISOString(), speed: 12.6 }
+        { lat: 25.40, lng: 58.30, timestamp: new Date(now.getTime() - 4*3600000).toISOString(), speed: 12.8 },
+        { lat: 25.45, lng: 58.10, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 12.5 },
+        { lat: 25.50, lng: 57.85, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 12.7 },
+        { lat: 25.55, lng: 57.65, timestamp: new Date(now.getTime() - 1*3600000).toISOString(), speed: 12.6 },
+        { lat: 25.60, lng: 57.50, timestamp: now.toISOString(), speed: 12.6 }
       ],
       portHistory: [
         { port: "Muscat", arrived: "2026-03-27T12:00:00Z", departed: "2026-03-30T08:00:00Z" }
@@ -669,7 +669,7 @@ function generateScenarioData() {
       vesselClass: "tanker",
       trackingMode: "dark",
       mmsi: null, imo: null, flag: null, callsign: null,
-      lat: 26.75,
+      lat: 26.25,
       lng: 55.60,
       course: 110.0,
       speed: 7.8,
@@ -694,10 +694,10 @@ function generateScenarioData() {
         { type: "dark_vessel", severity: "warning", message: "Unidentified tanker — no AIS, RF emissions consistent with VLCC-class vessel.", timestamp: new Date(now.getTime() - 3600000).toISOString() }
       ],
       trackHistory: [
-        { lat: 26.90, lng: 55.20, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 7.5 },
-        { lat: 26.85, lng: 55.35, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 7.8 },
-        { lat: 26.80, lng: 55.48, timestamp: new Date(now.getTime() - 1*3600000).toISOString(), speed: 7.7 },
-        { lat: 26.75, lng: 55.60, timestamp: now.toISOString(), speed: 7.8 }
+        { lat: 26.35, lng: 55.25, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 7.5 },
+        { lat: 26.32, lng: 55.38, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 7.8 },
+        { lat: 26.28, lng: 55.50, timestamp: new Date(now.getTime() - 1*3600000).toISOString(), speed: 7.7 },
+        { lat: 26.25, lng: 55.60, timestamp: now.toISOString(), speed: 7.8 }
       ],
       portHistory: [],
       lastUpdate: now.toISOString(),
@@ -745,8 +745,8 @@ function generateScenarioData() {
       vesselClass: "unknown",
       trackingMode: "dark",
       mmsi: null, imo: null, flag: null, callsign: null,
-      lat: 25.68,
-      lng: 56.95,
+      lat: 25.15,
+      lng: 57.50,
       course: 340.0,
       speed: 9.5,
       heading: null,
@@ -770,10 +770,10 @@ function generateScenarioData() {
         { type: "dark_vessel", severity: "critical", message: "Military-band radar emission detected. Unidentified vessel heading NNW in Gulf of Oman.", timestamp: new Date(now.getTime() - 600000).toISOString() }
       ],
       trackHistory: [
-        { lat: 25.40, lng: 57.10, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 9.8 },
-        { lat: 25.50, lng: 57.05, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 9.6 },
-        { lat: 25.60, lng: 57.00, timestamp: new Date(now.getTime() - 1*3600000).toISOString(), speed: 9.4 },
-        { lat: 25.68, lng: 56.95, timestamp: now.toISOString(), speed: 9.5 }
+        { lat: 24.90, lng: 57.65, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 9.8 },
+        { lat: 24.98, lng: 57.60, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 9.6 },
+        { lat: 25.08, lng: 57.55, timestamp: new Date(now.getTime() - 1*3600000).toISOString(), speed: 9.4 },
+        { lat: 25.15, lng: 57.50, timestamp: now.toISOString(), speed: 9.5 }
       ],
       portHistory: [],
       lastUpdate: now.toISOString(),
@@ -844,11 +844,11 @@ function generateScenarioData() {
       imo: "IMO9412890",
       flag: "PA",
       callsign: "3FMK2",
-      lat: 25.45,
-      lng: 56.55,
-      course: 30.0,
+      lat: 25.80,
+      lng: 57.80,
+      course: 320.0,
       speed: 11.5,
-      heading: 28,
+      heading: 318,
       destination: "BANDAR ABBAS",
       navStatus: "underway",
       draught: 9.0,
@@ -856,7 +856,7 @@ function generateScenarioData() {
       ais: {
         active: false,
         lastSeen: new Date(now.getTime() - 3 * 3600000).toISOString(),
-        lastPosition: { lat: 25.22, lng: 56.72 }
+        lastPosition: { lat: 25.50, lng: 58.20 }
       },
       rf: {
         detected: true,
@@ -871,12 +871,12 @@ function generateScenarioData() {
         { type: "ais_gap", severity: "warning", message: "AIS lost 3h ago in Gulf of Oman. Vessel now heading toward Strait of Hormuz.", timestamp: new Date(now.getTime() - 3*3600000).toISOString() }
       ],
       trackHistory: [
-        { lat: 25.05, lng: 56.88, timestamp: new Date(now.getTime() - 5*3600000).toISOString(), speed: 12.0 },
-        { lat: 25.12, lng: 56.82, timestamp: new Date(now.getTime() - 4*3600000).toISOString(), speed: 11.8 },
-        { lat: 25.22, lng: 56.72, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 11.5 },
-        { lat: 25.30, lng: 56.65, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 11.6 },
-        { lat: 25.38, lng: 56.60, timestamp: new Date(now.getTime() - 1*3600000).toISOString(), speed: 11.4 },
-        { lat: 25.45, lng: 56.55, timestamp: now.toISOString(), speed: 11.5 }
+        { lat: 25.30, lng: 58.50, timestamp: new Date(now.getTime() - 5*3600000).toISOString(), speed: 12.0 },
+        { lat: 25.38, lng: 58.40, timestamp: new Date(now.getTime() - 4*3600000).toISOString(), speed: 11.8 },
+        { lat: 25.50, lng: 58.20, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 11.5 },
+        { lat: 25.60, lng: 58.05, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 11.6 },
+        { lat: 25.70, lng: 57.90, timestamp: new Date(now.getTime() - 1*3600000).toISOString(), speed: 11.4 },
+        { lat: 25.80, lng: 57.80, timestamp: now.toISOString(), speed: 11.5 }
       ],
       portHistory: [
         { port: "Chabahar", arrived: "2026-03-26T14:00:00Z", departed: "2026-03-30T22:00:00Z" }
@@ -895,8 +895,8 @@ function generateScenarioData() {
       imo: "IMO9365420",
       flag: "HK",
       callsign: "VRDE5",
-      lat: 25.20,
-      lng: 55.28,
+      lat: 25.18,
+      lng: 56.45,
       course: 0,
       speed: 0.1,
       heading: 175,
@@ -909,8 +909,8 @@ function generateScenarioData() {
       imagery: [],
       alerts: [],
       trackHistory: [
-        { lat: 25.20, lng: 55.28, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 0.1 },
-        { lat: 25.20, lng: 55.28, timestamp: now.toISOString(), speed: 0.1 }
+        { lat: 25.18, lng: 56.45, timestamp: new Date(now.getTime() - 3*3600000).toISOString(), speed: 0.1 },
+        { lat: 25.18, lng: 56.45, timestamp: now.toISOString(), speed: 0.1 }
       ],
       portHistory: [
         { port: "Fujairah Anchorage", arrived: "2026-03-29T14:00:00Z", departed: null }
