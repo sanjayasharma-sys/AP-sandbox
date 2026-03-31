@@ -304,7 +304,7 @@ function generateScenarioData() {
       ais: {
         active: false,
         lastSeen: new Date(now.getTime() - 6 * 3600000).toISOString(),
-        lastPosition: { lat: 26.15, lng: 56.25 }
+        lastPosition: { lat: 26.55, lng: 56.28 }
       },
       rf: {
         detected: true,
@@ -349,17 +349,17 @@ function generateScenarioData() {
         }
       ],
       trackHistory: [
-        // Before going dark (AIS positions) — following shipping lane
-        { lat: 26.20, lng: 55.30, timestamp: new Date(now.getTime() - 10*3600000).toISOString(), speed: 12.0 },
-        { lat: 26.18, lng: 55.55, timestamp: new Date(now.getTime() - 9*3600000).toISOString(), speed: 11.5 },
-        { lat: 26.15, lng: 55.80, timestamp: new Date(now.getTime() - 8*3600000).toISOString(), speed: 11.8 },
-        { lat: 26.12, lng: 56.05, timestamp: new Date(now.getTime() - 7*3600000).toISOString(), speed: 11.2 },
-        // Last AIS position — entering Strait of Hormuz
-        { lat: 26.15, lng: 56.25, timestamp: new Date(now.getTime() - 6*3600000).toISOString(), speed: 10.8 },
-        // RF-only positions (after going dark) — continuing east through strait
-        { lat: 26.20, lng: 56.40, timestamp: new Date(now.getTime() - 5*3600000).toISOString(), speed: 10.5 },
-        { lat: 26.30, lng: 56.55, timestamp: new Date(now.getTime() - 4*3600000).toISOString(), speed: 10.3 },
-        { lat: 26.50, lng: 56.60, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 10.0 },
+        // Before going dark (AIS positions) — following shipping lane north of Musandam
+        { lat: 26.30, lng: 55.30, timestamp: new Date(now.getTime() - 10*3600000).toISOString(), speed: 12.0 },
+        { lat: 26.38, lng: 55.55, timestamp: new Date(now.getTime() - 9*3600000).toISOString(), speed: 11.5 },
+        { lat: 26.45, lng: 55.80, timestamp: new Date(now.getTime() - 8*3600000).toISOString(), speed: 11.8 },
+        { lat: 26.50, lng: 56.05, timestamp: new Date(now.getTime() - 7*3600000).toISOString(), speed: 11.2 },
+        // Last AIS position — in the TSS north of Musandam Peninsula
+        { lat: 26.55, lng: 56.28, timestamp: new Date(now.getTime() - 6*3600000).toISOString(), speed: 10.8 },
+        // RF-only positions (after going dark) — continuing northeast through strait
+        { lat: 26.58, lng: 56.42, timestamp: new Date(now.getTime() - 5*3600000).toISOString(), speed: 10.5 },
+        { lat: 26.60, lng: 56.55, timestamp: new Date(now.getTime() - 4*3600000).toISOString(), speed: 10.3 },
+        { lat: 26.60, lng: 56.63, timestamp: new Date(now.getTime() - 2*3600000).toISOString(), speed: 10.0 },
         { lat: 26.60, lng: 56.70, timestamp: now.toISOString(), speed: 10.1 }
       ],
       portHistory: [
