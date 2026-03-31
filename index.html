@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maritime Domain Awareness Dashboard</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <!-- App styles -->
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar">
+    <button id="sidebar-toggle">&#9776;</button>
+    <div class="navbar-brand">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="12" stroke="#00d4aa" stroke-width="1.5" fill="none"/>
+        <circle cx="14" cy="14" r="7" stroke="#00d4aa" stroke-width="1" fill="none" opacity="0.5"/>
+        <circle cx="14" cy="14" r="2" fill="#00d4aa"/>
+        <line x1="14" y1="2" x2="14" y2="6" stroke="#00d4aa" stroke-width="1" opacity="0.4"/>
+        <line x1="14" y1="22" x2="14" y2="26" stroke="#00d4aa" stroke-width="1" opacity="0.4"/>
+        <line x1="2" y1="14" x2="6" y2="14" stroke="#00d4aa" stroke-width="1" opacity="0.4"/>
+        <line x1="22" y1="14" x2="26" y2="14" stroke="#00d4aa" stroke-width="1" opacity="0.4"/>
+      </svg>
+      <span class="brand-text">Maritime Domain Awareness</span>
+      <span class="brand-sub">Multi-Source Tracking</span>
+    </div>
+
+    <div class="navbar-center">
+      <div class="navbar-status">
+        <div class="status-live">
+          <span class="live-dot"></span>
+          <span>LIVE FEED</span>
+        </div>
+        <span id="last-update">Initializing...</span>
+      </div>
+    </div>
+
+    <div class="navbar-right">
+      <span id="clock">--:--:--Z</span>
+    </div>
+  </nav>
+
+  <!-- ===== MAIN LAYOUT ===== -->
+  <div class="main-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-tabs">
+        <button class="sidebar-tab active" data-tab="overview">Overview</button>
+        <button class="sidebar-tab" data-tab="vessels">Vessels</button>
+        <button class="sidebar-tab" data-tab="analytics">Analytics</button>
+      </div>
+
+      <!-- Overview Panel -->
+      <div class="sidebar-panel active" id="panel-overview">
+        <!-- Stats Grid -->
+        <div class="stat-grid">
+          <div class="stat-card full-width">
+            <div class="stat-value" id="total-count">0</div>
+            <div class="stat-label">Total Tracks</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="correlated-count" style="color: var(--accent-ais)">0</div>
+            <div class="stat-label">Correlated</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="dark-count" style="color: var(--accent-danger)">0</div>
+            <div class="stat-label">Dark Vessels</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="alert-count" style="color: var(--accent-warning)">0</div>
+            <div class="stat-label">Alerts</div>
+          </div>
+        </div>
+
+        <!-- Source Filters -->
+        <div class="filter-section">
+          <h5>Data Sources</h5>
+          <div class="source-filter">
+            <div class="source-filter-item">
+              <div class="source-indicator" style="background: var(--accent-ais)"></div>
+              <span class="source-filter-label">AIS Transponder</span>
+              <span class="source-filter-count" id="ais-count">0</span>
+              <label class="toggle-switch">
+                <input type="checkbox" class="source-toggle" data-source="ais" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="source-filter-item">
+              <div class="source-indicator" style="background: var(--accent-rf)"></div>
+              <span class="source-filter-label">RF Emissions</span>
+              <span class="source-filter-count" id="rf-count">0</span>
+              <label class="toggle-switch">
+                <input type="checkbox" class="source-toggle" data-source="rf" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+            <div class="source-filter-item">
+              <div class="source-indicator" style="background: var(--accent-sat)"></div>
+              <span class="source-filter-label">Satellite Imagery</span>
+              <span class="source-filter-count" id="sat-count">0</span>
+              <label class="toggle-switch">
+                <input type="checkbox" class="source-toggle" data-source="satellite" checked>
+                <span class="toggle-slider"></span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- Additional Filters -->
+        <div class="filter-section">
+          <h5>Filters</h5>
+          <div class="search-wrapper">
+            <span class="search-icon">&#128269;</span>
+            <input type="text" class="search-input" id="vessel-search" placeholder="Search vessel, MMSI, ID...">
+          </div>
+
+          <div style="margin-top: 10px">
+            <label for="vessel-type-filter" style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px">Vessel Type</label>
+            <select class="filter-select" id="vessel-type-filter" style="margin-top: 4px">
+              <option value="all">All Types</option>
+              <option value="cargo">Cargo</option>
+              <option value="tanker">Tanker</option>
+              <option value="container">Container</option>
+              <option value="bulk_carrier">Bulk Carrier</option>
+              <option value="fishing">Fishing</option>
+              <option value="passenger">Passenger</option>
+              <option value="military">Military</option>
+              <option value="tug">Tug</option>
+            </select>
+          </div>
+
+          <div style="margin-top: 10px">
+            <label class="filter-checkbox">
+              <input type="checkbox" id="alerts-only">
+              <span>Alerts only</span>
+            </label>
+          </div>
+
+          <div style="margin-top: 10px">
+            <label style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px">Time Window</label>
+            <div class="time-slider-wrapper" style="margin-top: 4px">
+              <input type="range" class="time-slider" id="time-window" min="1" max="24" value="24">
+              <span class="time-slider-value" id="time-window-value">24h</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Data Freshness -->
+        <div class="filter-section">
+          <h5>Data Freshness</h5>
+          <div class="freshness-bars">
+            <div class="freshness-row">
+              <span class="freshness-source">AIS</span>
+              <div class="freshness-track">
+                <div class="freshness-bar" id="freshness-ais" style="width: 0%; background: var(--accent-ais)"></div>
+              </div>
+              <span class="freshness-label">--</span>
+            </div>
+            <div class="freshness-row">
+              <span class="freshness-source">RF</span>
+              <div class="freshness-track">
+                <div class="freshness-bar" id="freshness-rf" style="width: 0%; background: var(--accent-rf)"></div>
+              </div>
+              <span class="freshness-label">--</span>
+            </div>
+            <div class="freshness-row">
+              <span class="freshness-source">SAT</span>
+              <div class="freshness-track">
+                <div class="freshness-bar" id="freshness-satellite" style="width: 0%; background: var(--accent-sat)"></div>
+              </div>
+              <span class="freshness-label">--</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Vessels Panel -->
+      <div class="sidebar-panel" id="panel-vessels">
+        <div class="search-wrapper">
+          <span class="search-icon">&#128269;</span>
+          <input type="text" class="search-input" id="vessel-search-list" placeholder="Search vessels...">
+        </div>
+        <div class="vessel-list" id="vessel-list">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Analytics Panel -->
+      <div class="sidebar-panel" id="panel-analytics">
+        <div class="chart-container">
+          <h5>Track Sources</h5>
+          <div class="chart-wrap">
+            <canvas id="source-chart"></canvas>
+          </div>
+        </div>
+        <div class="chart-container">
+          <h5>Vessel Types</h5>
+          <div class="chart-wrap-small" style="height: 160px">
+            <canvas id="type-chart"></canvas>
+          </div>
+        </div>
+        <div class="stat-grid">
+          <div class="stat-card">
+            <div class="stat-value" style="color: var(--accent-ais)" id="correlated-count-2">0</div>
+            <div class="stat-label">Multi-Source</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" style="color: var(--accent-danger)" id="dark-count-2">0</div>
+            <div class="stat-label">Dark Vessels</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Map -->
+    <div class="map-wrapper">
+      <div id="map-container"></div>
+      <!-- Detail Panel -->
+      <div class="detail-panel" id="detail-panel">
+        <!-- Populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== BOTTOM BAR ===== -->
+  <footer class="bottombar">
+    <div class="bottombar-item">
+      <div class="bottombar-dot" style="background: var(--accent-ais)"></div>
+      <span>AIS Feed: Active</span>
+    </div>
+    <div class="bottombar-item">
+      <div class="bottombar-dot" style="background: var(--accent-rf)"></div>
+      <span>RF Sensors: Active</span>
+    </div>
+    <div class="bottombar-item">
+      <div class="bottombar-dot" style="background: var(--accent-sat)"></div>
+      <span>SAT Coverage: Active</span>
+    </div>
+    <div class="bottombar-spacer"></div>
+    <div class="bottombar-item">
+      <span>Area: South China Sea / Western Pacific</span>
+    </div>
+    <div class="bottombar-item">
+      <span>Classification: UNCLASSIFIED // DEMO</span>
+    </div>
+  </footer>
+
+  <!-- App Scripts (order matters) -->
+  <script src="js/utils.js"></script>
+  <script src="js/mock-data.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/vessel-detail.js"></script>
+  <script src="js/filters.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
