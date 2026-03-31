@@ -1,254 +1,386 @@
-// Mock Data Generator for Maritime Domain Awareness Dashboard
-// Generates realistic vessel tracks across the South China Sea region
+// Curated scenario data — Strait of Hormuz / Persian Gulf
+// 5 vessels for initial demo: 2 cooperative, 2 dark, 1 gone-dark
 
-const VESSEL_NAMES = [
-  "PACIFIC VOYAGER", "EASTERN SPIRIT", "OCEAN PIONEER", "STAR NAVIGATOR",
-  "GOLDEN DRAGON", "SEA EMPRESS", "CORAL MERCHANT", "SWIFT HORIZON",
-  "JADE CARRIER", "NORTHERN STAR", "BLUE MARLIN", "CRIMSON TIDE",
-  "PEARL RIVER", "SILVER WAVE", "IRON MONARCH", "CRYSTAL SEA",
-  "FORTUNE BRIDGE", "HARMONY SPIRIT", "GLOBAL PHOENIX", "SUMMIT TRADER",
-  "DAWN BREAKER", "EMERALD SKY", "ARCTIC WIND", "ROYAL FORTUNE",
-  "LIBERTY STAR", "DRAGON KING", "OCEAN TITAN", "MAERSK SERENITY",
-  "COSCO HARMONY", "EVERGREEN VALOR"
-];
+function generateScenarioData() {
+  const now = new Date("2026-03-31T07:00:00Z");
 
-const FLAGS = ["SG", "CN", "JP", "KR", "PH", "VN", "MY", "ID", "TW", "HK", "PA", "LR", "MH", "BS", "GR", "NO"];
+  const vessels = [
+    // ====== COOPERATIVE VESSELS ======
+    {
+      id: "V-001",
+      name: "DESH VIBHOR",
+      vesselClass: "tanker",
+      trackingMode: "cooperative",
+      mmsi: "419001234",
+      imo: "IMO9234567",
+      flag: "IN",
+      callsign: "ATCZ",
+      lat: 25.72,
+      lng: 56.42,
+      course: 285.0,
+      speed: 11.8,
+      heading: 283,
+      destination: "MUMBAI",
+      navStatus: "underway",
+      draught: 14.2,
+      dimensions: { length: 274, beam: 48 },
+      ais: { active: true, lastSeen: now.toISOString(), lastPosition: null },
+      rf: {
+        detected: true,
+        emitters: [
+          {
+            type: "x-band-nav",
+            frequencyMHz: 9410,
+            signalStrengthDbm: -58,
+            pulsePattern: "pulsed",
+            confidence: 0.96,
+            fingerprintId: "FP-V001-A"
+          },
+          {
+            type: "ku-vsat",
+            frequencyMHz: 14250,
+            signalStrengthDbm: -74,
+            pulsePattern: "continuous",
+            confidence: 0.89,
+            fingerprintId: "FP-V001-B"
+          }
+        ],
+        cepMeters: 3.8,
+        lastDetected: new Date(now.getTime() - 120000).toISOString()
+      },
+      imagery: [
+        {
+          id: "IMG-001",
+          type: "SAR",
+          satellite: "ICEYE-X7",
+          timestamp: new Date(now.getTime() - 4 * 3600000).toISOString(),
+          resolution: "1m",
+          cloudCover: null,
+          status: "acquired"
+        }
+      ],
+      alerts: [],
+      trackHistory: generateTrack(25.72, 56.42, 285, 11.8, now, 8),
+      portHistory: [
+        { port: "Fujairah", arrived: "2026-03-28T08:00:00Z", departed: "2026-03-30T14:00:00Z" },
+        { port: "Jebel Ali", arrived: "2026-03-24T06:00:00Z", departed: "2026-03-27T10:00:00Z" }
+      ],
+      lastUpdate: now.toISOString(),
+      firstDetected: "2026-03-15T00:00:00Z"
+    },
+    {
+      id: "V-002",
+      name: "OCEAN GUARDIAN",
+      vesselClass: "cargo",
+      trackingMode: "cooperative",
+      mmsi: "538006742",
+      imo: "IMO9876123",
+      flag: "MH",
+      callsign: "V7AB3",
+      lat: 26.48,
+      lng: 55.15,
+      course: 118.0,
+      speed: 14.2,
+      heading: 120,
+      destination: "SINGAPORE",
+      navStatus: "underway",
+      draught: 10.8,
+      dimensions: { length: 189, beam: 32 },
+      ais: { active: true, lastSeen: now.toISOString(), lastPosition: null },
+      rf: {
+        detected: false,
+        emitters: [],
+        cepMeters: null,
+        lastDetected: null
+      },
+      imagery: [],
+      alerts: [],
+      trackHistory: generateTrack(26.48, 55.15, 118, 14.2, now, 8),
+      portHistory: [
+        { port: "Dammam", arrived: "2026-03-26T12:00:00Z", departed: "2026-03-30T06:00:00Z" }
+      ],
+      lastUpdate: now.toISOString(),
+      firstDetected: "2026-03-20T00:00:00Z"
+    },
 
-const VESSEL_TYPES = ["cargo", "tanker", "fishing", "container", "bulk_carrier", "passenger", "military", "tug"];
+    // ====== DARK VESSELS (RF-only) ======
+    {
+      id: "V-003",
+      name: null,
+      vesselClass: "unknown",
+      trackingMode: "dark",
+      mmsi: null,
+      imo: null,
+      flag: null,
+      callsign: null,
+      lat: 26.31,
+      lng: 56.68,
+      course: 195.0,
+      speed: 8.5,
+      heading: null,
+      destination: null,
+      navStatus: "underway",
+      draught: null,
+      dimensions: null,
+      ais: { active: false, lastSeen: null, lastPosition: null },
+      rf: {
+        detected: true,
+        emitters: [
+          {
+            type: "x-band-nav",
+            frequencyMHz: 9380,
+            signalStrengthDbm: -65,
+            pulsePattern: "pulsed",
+            confidence: 0.88,
+            fingerprintId: "FP-V003-A"
+          },
+          {
+            type: "vhf-marine",
+            frequencyMHz: 156.8,
+            signalStrengthDbm: -82,
+            pulsePattern: "continuous",
+            confidence: 0.62,
+            fingerprintId: "FP-V003-B"
+          }
+        ],
+        cepMeters: 4.5,
+        lastDetected: new Date(now.getTime() - 300000).toISOString()
+      },
+      imagery: [
+        {
+          id: "IMG-003",
+          type: "SAR",
+          satellite: "Capella-6",
+          timestamp: new Date(now.getTime() - 2 * 3600000).toISOString(),
+          resolution: "0.5m",
+          cloudCover: null,
+          status: "processing"
+        }
+      ],
+      alerts: [
+        {
+          type: "dark_vessel",
+          severity: "warning",
+          message: "No AIS — tracked by RF emissions only. X-band nav radar + VHF marine radio detected.",
+          timestamp: new Date(now.getTime() - 600000).toISOString()
+        }
+      ],
+      trackHistory: generateTrack(26.31, 56.68, 195, 8.5, now, 6),
+      portHistory: [],
+      lastUpdate: now.toISOString(),
+      firstDetected: "2026-03-31T03:00:00Z"
+    },
+    {
+      id: "V-004",
+      name: null,
+      vesselClass: "tanker",
+      trackingMode: "dark",
+      mmsi: null,
+      imo: null,
+      flag: null,
+      callsign: null,
+      lat: 25.82,
+      lng: 56.78,
+      course: 210.0,
+      speed: 6.2,
+      heading: null,
+      destination: null,
+      navStatus: "underway",
+      draught: null,
+      dimensions: null,
+      ais: { active: false, lastSeen: null, lastPosition: null },
+      rf: {
+        detected: true,
+        emitters: [
+          {
+            type: "x-band-nav",
+            frequencyMHz: 9445,
+            signalStrengthDbm: -55,
+            pulsePattern: "pulsed",
+            confidence: 0.93,
+            fingerprintId: "FP-V004-A"
+          },
+          {
+            type: "ku-vsat",
+            frequencyMHz: 14100,
+            signalStrengthDbm: -70,
+            pulsePattern: "continuous",
+            confidence: 0.85,
+            fingerprintId: "FP-V004-B"
+          },
+          {
+            type: "l-satphone",
+            frequencyMHz: 1626.5,
+            signalStrengthDbm: -88,
+            pulsePattern: "continuous",
+            confidence: 0.71,
+            fingerprintId: "FP-V004-C"
+          }
+        ],
+        cepMeters: 2.9,
+        lastDetected: new Date(now.getTime() - 180000).toISOString()
+      },
+      imagery: [
+        {
+          id: "IMG-004a",
+          type: "EO",
+          satellite: "Pleiades Neo",
+          timestamp: new Date(now.getTime() - 6 * 3600000).toISOString(),
+          resolution: "0.3m",
+          cloudCover: 12,
+          status: "acquired"
+        },
+        {
+          id: "IMG-004b",
+          type: "SAR",
+          satellite: "ICEYE-X7",
+          timestamp: new Date(now.getTime() - 1 * 3600000).toISOString(),
+          resolution: "1m",
+          cloudCover: null,
+          status: "acquired"
+        }
+      ],
+      alerts: [
+        {
+          type: "dark_vessel",
+          severity: "critical",
+          message: "Suspected tanker — strong X-band radar + VSAT + satphone detected. Potential sanctions evasion.",
+          timestamp: new Date(now.getTime() - 900000).toISOString()
+        },
+        {
+          type: "ship_to_ship",
+          severity: "warning",
+          message: "Proximity alert: within 800m of V-003. Potential ship-to-ship transfer.",
+          timestamp: new Date(now.getTime() - 1200000).toISOString()
+        }
+      ],
+      trackHistory: generateTrack(25.82, 56.78, 210, 6.2, now, 6),
+      portHistory: [],
+      lastUpdate: now.toISOString(),
+      firstDetected: "2026-03-30T22:00:00Z"
+    },
 
-const NAV_STATUSES = ["underway", "at_anchor", "moored", "restricted_maneuverability", "not_under_command"];
+    // ====== GONE-DARK VESSEL ======
+    {
+      id: "V-005",
+      name: "SHADOW RUNNER",
+      vesselClass: "cargo",
+      trackingMode: "gone_dark",
+      mmsi: "412999888",
+      imo: "IMO9345678",
+      flag: "PA",
+      callsign: "3FXK7",
+      lat: 26.85,
+      lng: 56.02,
+      course: 45.0,
+      speed: 10.1,
+      heading: 43,
+      destination: "BANDAR ABBAS",
+      navStatus: "underway",
+      draught: 9.4,
+      dimensions: { length: 172, beam: 28 },
+      ais: {
+        active: false,
+        lastSeen: new Date(now.getTime() - 6 * 3600000).toISOString(),
+        lastPosition: { lat: 26.55, lng: 55.72 }
+      },
+      rf: {
+        detected: true,
+        emitters: [
+          {
+            type: "x-band-nav",
+            frequencyMHz: 9420,
+            signalStrengthDbm: -61,
+            pulsePattern: "pulsed",
+            confidence: 0.92,
+            fingerprintId: "FP-V005-A"
+          },
+          {
+            type: "s-band-radar",
+            frequencyMHz: 3050,
+            signalStrengthDbm: -68,
+            pulsePattern: "pulsed",
+            confidence: 0.78,
+            fingerprintId: "FP-V005-B"
+          }
+        ],
+        cepMeters: 4.1,
+        lastDetected: new Date(now.getTime() - 240000).toISOString()
+      },
+      imagery: [
+        {
+          id: "IMG-005",
+          type: "SAR",
+          satellite: "Sentinel-1A",
+          timestamp: new Date(now.getTime() - 3 * 3600000).toISOString(),
+          resolution: "5m",
+          cloudCover: null,
+          status: "acquired"
+        }
+      ],
+      alerts: [
+        {
+          type: "ais_gap",
+          severity: "critical",
+          message: "AIS lost 6h ago — still tracked via X-band + S-band radar emissions. Heading toward Bandar Abbas.",
+          timestamp: new Date(now.getTime() - 6 * 3600000).toISOString()
+        }
+      ],
+      trackHistory: [
+        // Before going dark (AIS positions)
+        { lat: 26.20, lng: 55.30, timestamp: new Date(now.getTime() - 10 * 3600000).toISOString(), speed: 12.0 },
+        { lat: 26.28, lng: 55.38, timestamp: new Date(now.getTime() - 9 * 3600000).toISOString(), speed: 11.5 },
+        { lat: 26.36, lng: 55.48, timestamp: new Date(now.getTime() - 8 * 3600000).toISOString(), speed: 11.8 },
+        { lat: 26.44, lng: 55.58, timestamp: new Date(now.getTime() - 7 * 3600000).toISOString(), speed: 11.2 },
+        // Last AIS position
+        { lat: 26.55, lng: 55.72, timestamp: new Date(now.getTime() - 6 * 3600000).toISOString(), speed: 10.8 },
+        // RF-only positions (after going dark)
+        { lat: 26.62, lng: 55.80, timestamp: new Date(now.getTime() - 5 * 3600000).toISOString(), speed: 10.5 },
+        { lat: 26.70, lng: 55.88, timestamp: new Date(now.getTime() - 4 * 3600000).toISOString(), speed: 10.3 },
+        { lat: 26.78, lng: 55.95, timestamp: new Date(now.getTime() - 2 * 3600000).toISOString(), speed: 10.0 },
+        { lat: 26.85, lng: 56.02, timestamp: now.toISOString(), speed: 10.1 }
+      ],
+      portHistory: [
+        { port: "Jebel Ali", arrived: "2026-03-27T10:00:00Z", departed: "2026-03-30T18:00:00Z" }
+      ],
+      lastUpdate: now.toISOString(),
+      firstDetected: "2026-03-25T00:00:00Z"
+    }
+  ];
 
-const SATELLITES = ["SENTINEL-1A", "SENTINEL-1B", "RADARSAT-2", "COSMO-SKYMED", "ICEYE-X7", "CAPELLA-6", "WORLDVIEW-3", "PLEIADES-NEO"];
-
-const SIGNAL_TYPES = ["radar", "comms", "satcom", "navigation", "ais-spoof"];
-const FREQUENCY_BANDS = ["X-band", "S-band", "L-band", "C-band", "Ku-band", "Ka-band", "VHF", "UHF"];
-
-// South China Sea bounding box
-const AREA = {
-  latMin: 4.0,
-  latMax: 22.0,
-  lngMin: 104.0,
-  lngMax: 121.0
-};
-
-// Shipping lanes / hotspot clusters
-const HOTSPOTS = [
-  { lat: 1.26, lng: 103.85, radius: 0.5, name: "Singapore Strait" },
-  { lat: 10.3, lng: 107.1, radius: 1.0, name: "Ho Chi Minh City approaches" },
-  { lat: 22.3, lng: 114.2, radius: 0.8, name: "Hong Kong" },
-  { lat: 14.6, lng: 120.9, radius: 0.6, name: "Manila Bay" },
-  { lat: 5.3, lng: 115.0, radius: 1.5, name: "Brunei-Sabah corridor" },
-  { lat: 16.0, lng: 112.3, radius: 2.0, name: "Paracel Islands" },
-  { lat: 9.5, lng: 114.0, radius: 2.5, name: "Spratly Islands" },
-  { lat: 18.2, lng: 109.8, radius: 0.8, name: "Hainan" }
-];
-
-function randomInRange(min, max) {
-  return min + Math.random() * (max - min);
+  return { vessels };
 }
 
-function randomChoice(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
-
-function generateMMSI() {
-  const mids = ["412", "431", "440", "441", "548", "574", "533", "525", "416", "477"];
-  return randomChoice(mids) + String(Math.floor(Math.random() * 1000000)).padStart(6, "0");
-}
-
-function generateIMO() {
-  return "IMO" + String(Math.floor(Math.random() * 9000000) + 1000000);
-}
-
-function generatePositionNearHotspot() {
-  if (Math.random() < 0.7) {
-    const hotspot = randomChoice(HOTSPOTS);
-    return {
-      lat: hotspot.lat + (Math.random() - 0.5) * hotspot.radius * 2,
-      lng: hotspot.lng + (Math.random() - 0.5) * hotspot.radius * 2
-    };
-  }
-  return {
-    lat: randomInRange(AREA.latMin, AREA.latMax),
-    lng: randomInRange(AREA.lngMin, AREA.lngMax)
-  };
-}
-
-function generateTrackHistory(baseLat, baseLng, course, speed, points = 8) {
+// Helper: generate simple track history along a course
+function generateTrack(lat, lng, course, speed, now, points) {
   const history = [];
-  let lat = baseLat;
-  let lng = baseLng;
-  const now = Date.now();
+  const courseRad = course * Math.PI / 180;
+  const stepHours = 0.5;
+
   for (let i = points; i >= 0; i--) {
-    const timeDelta = i * 30 * 60 * 1000; // 30 min intervals
-    const dist = speed * 0.00027 * 30; // approximate degree movement per 30 min at speed
+    const dt = i * stepHours;
+    const dist = speed * 0.00027 * stepHours * 60; // approx degree movement
     history.push({
-      lat: lat + (Math.random() - 0.5) * 0.01,
-      lng: lng + (Math.random() - 0.5) * 0.01,
-      timestamp: new Date(now - timeDelta).toISOString(),
-      speed: speed + (Math.random() - 0.5) * 2
+      lat: lat - Math.cos(courseRad) * dist * i + (Math.random() - 0.5) * 0.005,
+      lng: lng - Math.sin(courseRad) * dist * i + (Math.random() - 0.5) * 0.005,
+      timestamp: new Date(now.getTime() - dt * 3600000).toISOString(),
+      speed: speed + (Math.random() - 0.5) * 1.5
     });
-    lat -= Math.cos(course * Math.PI / 180) * dist;
-    lng -= Math.sin(course * Math.PI / 180) * dist;
   }
-  return history.reverse();
+  return history;
 }
 
-function generateMockData() {
-  const vessels = [];
-  const correlationGroups = {};
-  let correlationCounter = 1;
-
-  // Generate 30 AIS vessels
-  for (let i = 0; i < 30; i++) {
-    const pos = generatePositionNearHotspot();
-    const course = Math.random() * 360;
-    const speed = randomInRange(2, 22);
-    const correlationId = `TRACK-${String(correlationCounter++).padStart(3, "0")}`;
-    const vesselType = randomChoice(VESSEL_TYPES);
-
-    const vessel = {
-      id: `AIS-${String(i + 1).padStart(4, "0")}`,
-      source: "ais",
-      mmsi: generateMMSI(),
-      name: VESSEL_NAMES[i] || `VESSEL ${i + 1}`,
-      imo: generateIMO(),
-      flag: randomChoice(FLAGS),
-      vesselType: vesselType,
-      lat: pos.lat,
-      lng: pos.lng,
-      course: Math.round(course * 10) / 10,
-      speed: Math.round(speed * 10) / 10,
-      heading: Math.round(course + (Math.random() - 0.5) * 10),
-      destination: randomChoice(["SINGAPORE", "HONG KONG", "SHANGHAI", "TOKYO", "BUSAN", "MANILA", "HO CHI MINH", "BANGKOK", "JAKARTA"]),
-      navStatus: randomChoice(NAV_STATUSES),
-      timestamp: new Date(Date.now() - Math.random() * 3600000).toISOString(),
-      confidence: Math.round((0.85 + Math.random() * 0.15) * 100) / 100,
-      correlationId: correlationId,
-      trackHistory: generateTrackHistory(pos.lat, pos.lng, course, speed),
-      alerts: []
-    };
-
-    // Add some alerts/anomalies
-    if (Math.random() < 0.15) {
-      vessel.alerts.push({ type: "ais_gap", message: "AIS signal gap detected (2h 15m)", severity: "warning" });
-    }
-    if (Math.random() < 0.1) {
-      vessel.alerts.push({ type: "speed_anomaly", message: "Unusual speed change detected", severity: "caution" });
-    }
-    if (Math.random() < 0.05) {
-      vessel.alerts.push({ type: "zone_violation", message: "Entered restricted maritime zone", severity: "critical" });
-    }
-
-    vessels.push(vessel);
-    correlationGroups[correlationId] = [vessel];
-  }
-
-  // Generate 15 RF detections - some correlated to AIS, some standalone
-  for (let i = 0; i < 15; i++) {
-    let pos, correlationId;
-
-    if (i < 8 && vessels[i]) {
-      // Correlate with an existing AIS vessel
-      pos = {
-        lat: vessels[i].lat + (Math.random() - 0.5) * 0.05,
-        lng: vessels[i].lng + (Math.random() - 0.5) * 0.05
-      };
-      correlationId = vessels[i].correlationId;
-    } else {
-      // Standalone RF detection
-      pos = generatePositionNearHotspot();
-      correlationId = `TRACK-${String(correlationCounter++).padStart(3, "0")}`;
-    }
-
-    const detection = {
-      id: `RF-${String(i + 1).padStart(4, "0")}`,
-      source: "rf",
-      emitterId: `EM-${String(Math.floor(Math.random() * 9999)).padStart(4, "0")}`,
-      signalType: randomChoice(SIGNAL_TYPES),
-      frequencyBand: randomChoice(FREQUENCY_BANDS),
-      lat: pos.lat,
-      lng: pos.lng,
-      cep: Math.round((0.5 + Math.random() * 5) * 10) / 10,
-      signalStrength: Math.round(-60 - Math.random() * 40),
-      timestamp: new Date(Date.now() - Math.random() * 7200000).toISOString(),
-      confidence: Math.round((0.5 + Math.random() * 0.35) * 100) / 100,
-      attributed: i < 8,
-      correlationId: correlationId,
-      alerts: []
-    };
-
-    if (detection.signalType === "ais-spoof") {
-      detection.alerts.push({ type: "spoofing", message: "Potential AIS spoofing detected", severity: "critical" });
-    }
-
-    vessels.push(detection);
-    if (correlationGroups[correlationId]) {
-      correlationGroups[correlationId].push(detection);
-    } else {
-      correlationGroups[correlationId] = [detection];
-    }
-  }
-
-  // Generate 12 satellite detections
-  for (let i = 0; i < 12; i++) {
-    let pos, correlationId;
-
-    if (i < 5 && vessels[i]) {
-      pos = {
-        lat: vessels[i].lat + (Math.random() - 0.5) * 0.03,
-        lng: vessels[i].lng + (Math.random() - 0.5) * 0.03
-      };
-      correlationId = vessels[i].correlationId;
-    } else {
-      pos = generatePositionNearHotspot();
-      correlationId = `TRACK-${String(correlationCounter++).padStart(3, "0")}`;
-    }
-
-    const sensorType = Math.random() < 0.6 ? "SAR" : "EO";
-    const detection = {
-      id: `SAT-${String(i + 1).padStart(4, "0")}`,
-      source: "satellite",
-      sensorType: sensorType,
-      satellite: randomChoice(SATELLITES),
-      lat: pos.lat,
-      lng: pos.lng,
-      estimatedLength: Math.round(50 + Math.random() * 300),
-      estimatedBeam: Math.round(10 + Math.random() * 50),
-      timestamp: new Date(Date.now() - (1 + Math.random() * 12) * 3600000).toISOString(),
-      cloudCover: sensorType === "SAR" ? 0 : Math.round(Math.random() * 80),
-      confidence: Math.round((0.4 + Math.random() * 0.4) * 100) / 100,
-      correlationId: correlationId,
-      alerts: []
-    };
-
-    if (i >= 5) {
-      detection.alerts.push({ type: "dark_vessel", message: "No AIS correlation - potential dark vessel", severity: "warning" });
-    }
-
-    vessels.push(detection);
-    if (correlationGroups[correlationId]) {
-      correlationGroups[correlationId].push(detection);
-    } else {
-      correlationGroups[correlationId] = [detection];
-    }
-  }
-
-  return { vessels, correlationGroups };
-}
-
-// Simulate live position updates
+// Simulate live position updates for cooperative underway vessels
 function updateVesselPositions(vessels) {
   vessels.forEach(v => {
-    if (v.source === "ais" && v.navStatus === "underway") {
+    if (v.trackingMode === "cooperative" && v.navStatus === "underway") {
       const speedFactor = (v.speed || 10) * 0.00001;
       const courseRad = (v.course || 0) * Math.PI / 180;
       v.lat += Math.cos(courseRad) * speedFactor + (Math.random() - 0.5) * 0.001;
       v.lng += Math.sin(courseRad) * speedFactor + (Math.random() - 0.5) * 0.001;
-      v.course = (v.course + (Math.random() - 0.5) * 2) % 360;
-      if (v.course < 0) v.course += 360;
+      v.course = ((v.course || 0) + (Math.random() - 0.5) * 2 + 360) % 360;
       v.speed = Math.max(0, v.speed + (Math.random() - 0.5) * 0.5);
-      v.timestamp = new Date().toISOString();
+      v.lastUpdate = new Date().toISOString();
     }
   });
 }

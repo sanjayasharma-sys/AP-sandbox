@@ -1,111 +1,74 @@
-// Dashboard module - summary statistics and Chart.js charts
+// Dashboard module - analytics charts for the Analytics slide panel
 
-let sourceChart = null;
-let typeChart = null;
+let modeChart = null;
+let classChart = null;
 
 function initDashboard() {
   updateDashboard();
 }
 
 function updateDashboard() {
-  const { vessels, correlationGroups } = window.appState;
+  const { vessels } = window.appState;
   if (!vessels) return;
 
-  // Compute stats
-  const stats = computeStats(vessels, correlationGroups);
+  const stats = computeStats(vessels);
 
   // Update stat cards
-  updateStatCard("total-count", stats.total);
-  updateStatCard("ais-count", stats.bySrc.ais);
-  updateStatCard("rf-count", stats.bySrc.rf);
-  updateStatCard("sat-count", stats.bySrc.satellite);
-  updateStatCard("correlated-count", stats.correlated);
-  updateStatCard("dark-count", stats.dark);
-  updateStatCard("alert-count", stats.alerts);
-  updateStatCard("correlated-count-2", stats.correlated);
-  updateStatCard("dark-count-2", stats.dark);
+  setStatValue("stat-total", stats.total);
+  setStatValue("stat-cooperative", stats.cooperative);
+  setStatValue("stat-dark", stats.dark);
+  setStatValue("stat-gone-dark", stats.goneDark);
+  setStatValue("stat-alerts", stats.alerts);
 
-  // Update charts
-  updateSourceChart(stats);
-  updateTypeChart(stats);
-  updateDataFreshness(stats);
+  updateModeChart(stats);
+  updateClassChart(stats);
 }
 
-function computeStats(vessels, correlationGroups) {
-  const bySrc = { ais: 0, rf: 0, satellite: 0 };
-  const byType = {};
+function computeStats(vessels) {
+  const byMode = { cooperative: 0, dark: 0, gone_dark: 0 };
+  const byClass = {};
   let alerts = 0;
-  const now = Date.now();
-  const ages = { ais: [], rf: [], satellite: [] };
 
   vessels.forEach(v => {
-    bySrc[v.source]++;
-    if (v.vesselType) {
-      byType[v.vesselType] = (byType[v.vesselType] || 0) + 1;
-    }
+    byMode[v.trackingMode] = (byMode[v.trackingMode] || 0) + 1;
+    byClass[v.vesselClass] = (byClass[v.vesselClass] || 0) + 1;
     if (v.alerts && v.alerts.length > 0) alerts++;
-    const age = (now - new Date(v.timestamp).getTime()) / 3600000;
-    ages[v.source].push(age);
-  });
-
-  // Count correlated tracks (groups with >1 source)
-  let correlated = 0;
-  let dark = 0;
-  Object.values(correlationGroups).forEach(group => {
-    const srcSet = new Set(group.map(v => v.source));
-    if (srcSet.size > 1) correlated++;
-    if (!srcSet.has("ais") && (srcSet.has("rf") || srcSet.has("satellite"))) dark++;
-  });
-
-  // Average ages
-  const avgAge = {};
-  Object.keys(ages).forEach(s => {
-    const arr = ages[s];
-    avgAge[s] = arr.length > 0 ? arr.reduce((a, b) => a + b, 0) / arr.length : 0;
   });
 
   return {
     total: vessels.length,
-    bySrc,
-    byType,
-    correlated,
-    dark,
+    cooperative: byMode.cooperative,
+    dark: byMode.dark,
+    goneDark: byMode.gone_dark,
     alerts,
-    avgAge
+    byMode,
+    byClass
   };
 }
 
-function updateStatCard(id, value) {
-  const el = document.getElementById(id);
-  if (el) {
-    const current = parseInt(el.textContent) || 0;
-    if (current !== value) {
-      el.textContent = value;
-      el.classList.add("stat-updated");
-      setTimeout(() => el.classList.remove("stat-updated"), 600);
-    }
-  }
-}
-
-function updateSourceChart(stats) {
-  const canvas = document.getElementById("source-chart");
+function updateModeChart(stats) {
+  const canvas = document.getElementById("mode-chart");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
 
-  if (sourceChart) {
-    sourceChart.data.datasets[0].data = [stats.bySrc.ais, stats.bySrc.rf, stats.bySrc.satellite];
-    sourceChart.update("none");
+  const data = [stats.cooperative, stats.dark, stats.goneDark];
+  const colors = ["#22C55E", "#E8461E", "#F59E0B"];
+  const labels = ["Cooperative", "Dark Vessels", "Gone Dark"];
+
+  if (modeChart) {
+    modeChart.data.datasets[0].data = data;
+    modeChart.update("none");
     return;
   }
 
-  sourceChart = new Chart(ctx, {
+  modeChart = new Chart(ctx, {
     type: "doughnut",
     data: {
-      labels: ["AIS", "RF Emissions", "Satellite"],
+      labels: labels,
       datasets: [{
-        data: [stats.bySrc.ais, stats.bySrc.rf, stats.bySrc.satellite],
-        backgroundColor: [SOURCE_COLORS.ais, SOURCE_COLORS.rf, SOURCE_COLORS.satellite],
-        borderColor: "#0f1d32",
+        data: data,
+        backgroundColor: colors,
+        borderColor: "#0C1424",
         borderWidth: 2
       }]
     },
@@ -115,36 +78,47 @@ function updateSourceChart(stats) {
       cutout: "65%",
       plugins: {
         legend: {
-          display: false
+          position: "bottom",
+          labels: {
+            color: "#8A94A8",
+            font: { size: 11, family: "Inter" },
+            padding: 12,
+            usePointStyle: true,
+            pointStyleWidth: 8
+          }
         }
       }
     }
   });
 }
 
-function updateTypeChart(stats) {
-  const canvas = document.getElementById("type-chart");
+function updateClassChart(stats) {
+  const canvas = document.getElementById("class-chart");
   if (!canvas) return;
   const ctx = canvas.getContext("2d");
 
-  const labels = Object.keys(stats.byType).map(k => VESSEL_TYPE_LABELS[k] || k);
-  const values = Object.values(stats.byType);
+  const classKeys = Object.keys(stats.byClass);
+  const labels = classKeys.map(k => getVesselClassLabel(k));
+  const values = classKeys.map(k => stats.byClass[k]);
+  const colors = classKeys.map(k => getVesselClassColor(k));
 
-  if (typeChart) {
-    typeChart.data.labels = labels;
-    typeChart.data.datasets[0].data = values;
-    typeChart.update("none");
+  if (classChart) {
+    classChart.data.labels = labels;
+    classChart.data.datasets[0].data = values;
+    classChart.data.datasets[0].backgroundColor = colors.map(c => c + "40");
+    classChart.data.datasets[0].borderColor = colors;
+    classChart.update("none");
     return;
   }
 
-  typeChart = new Chart(ctx, {
+  classChart = new Chart(ctx, {
     type: "bar",
     data: {
       labels: labels,
       datasets: [{
         data: values,
-        backgroundColor: "#00d4aa40",
-        borderColor: "#00d4aa",
+        backgroundColor: colors.map(c => c + "40"),
+        borderColor: colors,
         borderWidth: 1,
         borderRadius: 3
       }]
@@ -158,28 +132,14 @@ function updateTypeChart(stats) {
       },
       scales: {
         x: {
-          grid: { color: "#ffffff10" },
-          ticks: { color: "#8892a4", font: { size: 10 } }
+          grid: { color: "#ffffff08" },
+          ticks: { color: "#8A94A8", font: { size: 10 } }
         },
         y: {
           grid: { display: false },
-          ticks: { color: "#8892a4", font: { size: 10 } }
+          ticks: { color: "#8A94A8", font: { size: 10 } }
         }
       }
-    }
-  });
-}
-
-function updateDataFreshness(stats) {
-  ["ais", "rf", "satellite"].forEach(source => {
-    const bar = document.getElementById(`freshness-${source}`);
-    if (bar) {
-      const avgMinutes = Math.round(stats.avgAge[source] * 60);
-      const freshness = Math.max(0, Math.min(100, 100 - stats.avgAge[source] * 10));
-      bar.style.width = freshness + "%";
-      bar.title = `Avg age: ${avgMinutes}m`;
-      const label = bar.parentElement.querySelector(".freshness-label");
-      if (label) label.textContent = avgMinutes < 60 ? `${avgMinutes}m` : `${(avgMinutes / 60).toFixed(1)}h`;
     }
   });
 }

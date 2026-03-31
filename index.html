@@ -3,262 +3,253 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Maritime Domain Awareness Dashboard</title>
-
-  <!-- Fonts -->
+  <title>uLook Space - Maritime Intelligence Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-
-  <!-- Leaflet -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-
-  <!-- App styles -->
   <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-  <!-- ===== NAVBAR ===== -->
+  <!-- NAVBAR -->
   <nav class="navbar">
-    <button id="sidebar-toggle">&#9776;</button>
-    <div class="navbar-brand">
-      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
-        <circle cx="14" cy="14" r="12" stroke="#00d4aa" stroke-width="1.5" fill="none"/>
-        <circle cx="14" cy="14" r="7" stroke="#00d4aa" stroke-width="1" fill="none" opacity="0.5"/>
-        <circle cx="14" cy="14" r="2" fill="#00d4aa"/>
-        <line x1="14" y1="2" x2="14" y2="6" stroke="#00d4aa" stroke-width="1" opacity="0.4"/>
-        <line x1="14" y1="22" x2="14" y2="26" stroke="#00d4aa" stroke-width="1" opacity="0.4"/>
-        <line x1="2" y1="14" x2="6" y2="14" stroke="#00d4aa" stroke-width="1" opacity="0.4"/>
-        <line x1="22" y1="14" x2="26" y2="14" stroke="#00d4aa" stroke-width="1" opacity="0.4"/>
+    <div class="navbar-left">
+      <svg class="navbar-logo" width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="14" cy="14" r="4" fill="#E8461E"/>
+        <path d="M14 6C9.58 6 6 9.58 6 14s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8z" stroke="#E8461E" stroke-width="1.5" fill="none" opacity="0.7"/>
+        <path d="M14 2C7.37 2 2 7.37 2 14s5.37 12 12 12 12-5.37 12-12S20.63 2 14 2z" stroke="#E8461E" stroke-width="1.5" fill="none" opacity="0.4"/>
+        <line x1="14" y1="0" x2="14" y2="6" stroke="#E8461E" stroke-width="1.5" opacity="0.5"/>
+        <line x1="14" y1="22" x2="14" y2="28" stroke="#E8461E" stroke-width="1.5" opacity="0.5"/>
+        <line x1="0" y1="14" x2="6" y2="14" stroke="#E8461E" stroke-width="1.5" opacity="0.5"/>
+        <line x1="22" y1="14" x2="28" y2="14" stroke="#E8461E" stroke-width="1.5" opacity="0.5"/>
       </svg>
-      <span class="brand-text">Maritime Domain Awareness</span>
-      <span class="brand-sub">Multi-Source Tracking</span>
+      <span class="navbar-brand">uLook Space</span>
     </div>
-
     <div class="navbar-center">
-      <div class="navbar-status">
-        <div class="status-live">
-          <span class="live-dot"></span>
-          <span>LIVE FEED</span>
-        </div>
-        <span id="last-update">Initializing...</span>
-      </div>
+      <span class="live-dot"></span>
+      <span class="live-label">LIVE FEED</span>
+      <span class="navbar-divider"></span>
+      <span class="navbar-title">Maritime Intelligence Platform</span>
+      <span class="navbar-divider"></span>
+      <span class="navbar-update" id="last-update">Last update: --:--:--Z</span>
     </div>
-
     <div class="navbar-right">
-      <span id="clock">--:--:--Z</span>
+      <span class="navbar-clock" id="navbar-clock">--:--:--Z</span>
+      <button class="mobile-toggle" id="mobile-toggle" aria-label="Toggle sidebar">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="2" y="4" width="16" height="2" rx="1" fill="currentColor"/>
+          <rect x="2" y="9" width="16" height="2" rx="1" fill="currentColor"/>
+          <rect x="2" y="14" width="16" height="2" rx="1" fill="currentColor"/>
+        </svg>
+      </button>
     </div>
   </nav>
 
-  <!-- ===== MAIN LAYOUT ===== -->
   <div class="main-layout">
-    <!-- Sidebar -->
-    <aside class="sidebar" id="sidebar">
-      <div class="sidebar-tabs">
-        <button class="sidebar-tab active" data-tab="overview">Overview</button>
-        <button class="sidebar-tab" data-tab="vessels">Vessels</button>
-        <button class="sidebar-tab" data-tab="analytics">Analytics</button>
-      </div>
-
-      <!-- Overview Panel -->
-      <div class="sidebar-panel active" id="panel-overview">
-        <!-- Stats Grid -->
-        <div class="stat-grid">
-          <div class="stat-card full-width">
-            <div class="stat-value" id="total-count">0</div>
-            <div class="stat-label">Total Tracks</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="correlated-count" style="color: var(--accent-ais)">0</div>
-            <div class="stat-label">Correlated</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="dark-count" style="color: var(--accent-danger)">0</div>
-            <div class="stat-label">Dark Vessels</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" id="alert-count" style="color: var(--accent-warning)">0</div>
-            <div class="stat-label">Alerts</div>
-          </div>
-        </div>
-
-        <!-- Source Filters -->
-        <div class="filter-section">
-          <h5>Data Sources</h5>
-          <div class="source-filter">
-            <div class="source-filter-item">
-              <div class="source-indicator" style="background: var(--accent-ais)"></div>
-              <span class="source-filter-label">AIS Transponder</span>
-              <span class="source-filter-count" id="ais-count">0</span>
-              <label class="toggle-switch">
-                <input type="checkbox" class="source-toggle" data-source="ais" checked>
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-            <div class="source-filter-item">
-              <div class="source-indicator" style="background: var(--accent-rf)"></div>
-              <span class="source-filter-label">RF Emissions</span>
-              <span class="source-filter-count" id="rf-count">0</span>
-              <label class="toggle-switch">
-                <input type="checkbox" class="source-toggle" data-source="rf" checked>
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-            <div class="source-filter-item">
-              <div class="source-indicator" style="background: var(--accent-sat)"></div>
-              <span class="source-filter-label">Satellite Imagery</span>
-              <span class="source-filter-count" id="sat-count">0</span>
-              <label class="toggle-switch">
-                <input type="checkbox" class="source-toggle" data-source="satellite" checked>
-                <span class="toggle-slider"></span>
-              </label>
-            </div>
-          </div>
-        </div>
-
-        <!-- Additional Filters -->
-        <div class="filter-section">
-          <h5>Filters</h5>
-          <div class="search-wrapper">
-            <span class="search-icon">&#128269;</span>
-            <input type="text" class="search-input" id="vessel-search" placeholder="Search vessel, MMSI, ID...">
-          </div>
-
-          <div style="margin-top: 10px">
-            <label for="vessel-type-filter" style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px">Vessel Type</label>
-            <select class="filter-select" id="vessel-type-filter" style="margin-top: 4px">
-              <option value="all">All Types</option>
-              <option value="cargo">Cargo</option>
-              <option value="tanker">Tanker</option>
-              <option value="container">Container</option>
-              <option value="bulk_carrier">Bulk Carrier</option>
-              <option value="fishing">Fishing</option>
-              <option value="passenger">Passenger</option>
-              <option value="military">Military</option>
-              <option value="tug">Tug</option>
-            </select>
-          </div>
-
-          <div style="margin-top: 10px">
-            <label class="filter-checkbox">
-              <input type="checkbox" id="alerts-only">
-              <span>Alerts only</span>
-            </label>
-          </div>
-
-          <div style="margin-top: 10px">
-            <label style="font-size: 10px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px">Time Window</label>
-            <div class="time-slider-wrapper" style="margin-top: 4px">
-              <input type="range" class="time-slider" id="time-window" min="1" max="24" value="24">
-              <span class="time-slider-value" id="time-window-value">24h</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Data Freshness -->
-        <div class="filter-section">
-          <h5>Data Freshness</h5>
-          <div class="freshness-bars">
-            <div class="freshness-row">
-              <span class="freshness-source">AIS</span>
-              <div class="freshness-track">
-                <div class="freshness-bar" id="freshness-ais" style="width: 0%; background: var(--accent-ais)"></div>
-              </div>
-              <span class="freshness-label">--</span>
-            </div>
-            <div class="freshness-row">
-              <span class="freshness-source">RF</span>
-              <div class="freshness-track">
-                <div class="freshness-bar" id="freshness-rf" style="width: 0%; background: var(--accent-rf)"></div>
-              </div>
-              <span class="freshness-label">--</span>
-            </div>
-            <div class="freshness-row">
-              <span class="freshness-source">SAT</span>
-              <div class="freshness-track">
-                <div class="freshness-bar" id="freshness-satellite" style="width: 0%; background: var(--accent-sat)"></div>
-              </div>
-              <span class="freshness-label">--</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Vessels Panel -->
-      <div class="sidebar-panel" id="panel-vessels">
-        <div class="search-wrapper">
-          <span class="search-icon">&#128269;</span>
-          <input type="text" class="search-input" id="vessel-search-list" placeholder="Search vessels...">
-        </div>
-        <div class="vessel-list" id="vessel-list">
-          <!-- Populated dynamically -->
-        </div>
-      </div>
-
-      <!-- Analytics Panel -->
-      <div class="sidebar-panel" id="panel-analytics">
-        <div class="chart-container">
-          <h5>Track Sources</h5>
-          <div class="chart-wrap">
-            <canvas id="source-chart"></canvas>
-          </div>
-        </div>
-        <div class="chart-container">
-          <h5>Vessel Types</h5>
-          <div class="chart-wrap-small" style="height: 160px">
-            <canvas id="type-chart"></canvas>
-          </div>
-        </div>
-        <div class="stat-grid">
-          <div class="stat-card">
-            <div class="stat-value" style="color: var(--accent-ais)" id="correlated-count-2">0</div>
-            <div class="stat-label">Multi-Source</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value" style="color: var(--accent-danger)" id="dark-count-2">0</div>
-            <div class="stat-label">Dark Vessels</div>
-          </div>
-        </div>
-      </div>
+    <!-- SLIM LEFT TOOLBAR -->
+    <aside class="toolbar" id="toolbar">
+      <button class="toolbar-btn" data-panel="layers" title="Layers & Filters">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 2L2 7l8 5 8-5-8-5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M2 10l8 5 8-5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" opacity="0.7"/>
+          <path d="M2 13l8 5 8-5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" opacity="0.4"/>
+        </svg>
+      </button>
+      <button class="toolbar-btn" data-panel="vessels" title="Vessel List">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M3 14l2 3h10l2-3" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M5 14V8l5-4 5 4v6" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <line x1="10" y1="4" x2="10" y2="2" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </button>
+      <button class="toolbar-btn" data-panel="alerts" title="Alerts">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 2C10 2 4 7 4 11c0 2 1 4 3 5h6c2-1 3-3 3-5 0-4-6-9-6-9z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M8 16v1a2 2 0 004 0v-1" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+        <span class="alert-badge" id="alert-badge">3</span>
+      </button>
+      <button class="toolbar-btn" data-panel="analytics" title="Analytics">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="2" y="10" width="3" height="8" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="7" y="6" width="3" height="12" rx="1" stroke="currentColor" stroke-width="1.5"/>
+          <rect x="12" y="2" width="3" height="16" rx="1" stroke="currentColor" stroke-width="1.5"/>
+        </svg>
+      </button>
+      <div class="toolbar-spacer"></div>
+      <button class="toolbar-btn" data-panel="legend" title="Legend">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+          <circle cx="10" cy="7" r="1" fill="currentColor"/>
+          <path d="M10 10v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
     </aside>
 
-    <!-- Map -->
+    <!-- SLIDE-OUT PANELS -->
+
+    <!-- Layers Panel -->
+    <div class="slide-panel" id="panel-layers">
+      <div class="panel-header"><h3>Layers &amp; Filters</h3><button class="panel-close">&times;</button></div>
+      <div class="panel-body">
+        <div class="filter-section">
+          <h5>Data Sources</h5>
+          <label class="toggle-row">
+            <span class="toggle-label"><span class="toggle-dot" style="background:#22C55E"></span>AIS Feed</span>
+            <input type="checkbox" class="toggle-switch" data-layer="ais" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <label class="toggle-row">
+            <span class="toggle-label"><span class="toggle-dot" style="background:#E8461E"></span>RF / ELINT</span>
+            <input type="checkbox" class="toggle-switch" data-layer="rf" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <label class="toggle-row">
+            <span class="toggle-label"><span class="toggle-dot" style="background:#3B82F6"></span>SAR Imagery</span>
+            <input type="checkbox" class="toggle-switch" data-layer="sat" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="filter-section">
+          <h5>Tracking Mode</h5>
+          <label class="toggle-row">
+            <span class="toggle-label"><span class="toggle-dot" style="background:#22C55E"></span>Cooperative</span>
+            <input type="checkbox" class="toggle-switch" data-mode="cooperative" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <label class="toggle-row">
+            <span class="toggle-label"><span class="toggle-dot" style="background:#E8461E"></span>Dark</span>
+            <input type="checkbox" class="toggle-switch" data-mode="dark" checked>
+            <span class="toggle-slider"></span>
+          </label>
+          <label class="toggle-row">
+            <span class="toggle-label"><span class="toggle-dot" style="background:#F59E0B"></span>Gone Dark</span>
+            <input type="checkbox" class="toggle-switch" data-mode="gone_dark" checked>
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+        <div class="filter-section">
+          <h5>Vessel Class</h5>
+          <select class="filter-select" id="class-filter">
+            <option value="all">All Classes</option>
+            <option value="cargo">Cargo</option>
+            <option value="tanker">Tanker</option>
+            <option value="fishing">Fishing</option>
+            <option value="military">Military</option>
+            <option value="passenger">Passenger</option>
+            <option value="unknown">Unknown</option>
+          </select>
+        </div>
+        <div class="filter-section">
+          <h5>Search</h5>
+          <input type="text" class="search-input" id="layer-search" placeholder="Filter by name, MMSI...">
+        </div>
+        <div class="filter-section">
+          <h5>Time Window</h5>
+          <input type="range" class="time-slider" id="time-slider" min="1" max="72" value="24">
+          <div class="slider-labels"><span>1h</span><span id="time-value">24h</span><span>72h</span></div>
+        </div>
+        <div class="filter-section">
+          <label class="toggle-row">
+            <span class="toggle-label">Alerts only</span>
+            <input type="checkbox" class="toggle-switch" id="alerts-only">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Vessels Panel -->
+    <div class="slide-panel" id="panel-vessels">
+      <div class="panel-header"><h3>Vessels</h3><button class="panel-close">&times;</button></div>
+      <div class="panel-body">
+        <input type="text" class="search-input" id="vessel-search" placeholder="Search vessel, MMSI, ID...">
+        <div class="vessel-tabs">
+          <button class="vessel-tab active" data-filter="all">All</button>
+          <button class="vessel-tab" data-filter="dark">Dark</button>
+          <button class="vessel-tab" data-filter="gone_dark">Gone Dark</button>
+          <button class="vessel-tab" data-filter="alerts">Alerts</button>
+        </div>
+        <div class="vessel-list" id="vessel-list"></div>
+      </div>
+    </div>
+
+    <!-- Alerts Panel -->
+    <div class="slide-panel" id="panel-alerts">
+      <div class="panel-header"><h3>Alerts</h3><button class="panel-close">&times;</button></div>
+      <div class="panel-body">
+        <div class="alert-feed" id="alert-feed"></div>
+      </div>
+    </div>
+
+    <!-- Analytics Panel -->
+    <div class="slide-panel" id="panel-analytics">
+      <div class="panel-header"><h3>Analytics</h3><button class="panel-close">&times;</button></div>
+      <div class="panel-body">
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-value" id="stat-total">0</div><div class="stat-label">Total Tracked</div></div>
+          <div class="stat-card"><div class="stat-value coop" id="stat-cooperative">0</div><div class="stat-label">Cooperative</div></div>
+          <div class="stat-card stat-hero"><div class="stat-value dark" id="stat-dark">0</div><div class="stat-label">Dark Vessels</div></div>
+          <div class="stat-card"><div class="stat-value gone" id="stat-gone-dark">0</div><div class="stat-label">Gone Dark</div></div>
+          <div class="stat-card"><div class="stat-value alert" id="stat-alerts">0</div><div class="stat-label">Active Alerts</div></div>
+        </div>
+        <div class="chart-container"><h5>Tracking Mode</h5><div class="chart-wrap"><canvas id="mode-chart"></canvas></div></div>
+        <div class="chart-container"><h5>Vessel Classes</h5><div class="chart-wrap-tall"><canvas id="class-chart"></canvas></div></div>
+      </div>
+    </div>
+
+    <!-- Legend Panel -->
+    <div class="slide-panel" id="panel-legend">
+      <div class="panel-header"><h3>Legend</h3><button class="panel-close">&times;</button></div>
+      <div class="panel-body">
+        <div class="legend-section">
+          <h5>Tracking Mode</h5>
+          <div class="legend-item"><span class="legend-dot" style="background:#22C55E"></span> Cooperative (AIS Active)</div>
+          <div class="legend-item"><span class="legend-dot pulsing" style="background:#E8461E"></span> Dark Vessel (RF Only)</div>
+          <div class="legend-item"><span class="legend-dot pulsing" style="background:#F59E0B"></span> Gone Dark (AIS Lost)</div>
+        </div>
+        <div class="legend-section">
+          <h5>Vessel Class</h5>
+          <div class="legend-item"><span class="legend-shape chevron" style="color:#3B82F6"></span> Cargo</div>
+          <div class="legend-item"><span class="legend-shape diamond" style="color:#8B5CF6"></span> Tanker</div>
+          <div class="legend-item"><span class="legend-shape circle" style="color:#06B6D4"></span> Fishing</div>
+          <div class="legend-item"><span class="legend-shape triangle" style="color:#EF4444"></span> Military</div>
+          <div class="legend-item"><span class="legend-shape rounded" style="color:#10B981"></span> Passenger</div>
+          <div class="legend-item"><span class="legend-shape dashed" style="color:#6B7280"></span> Unknown</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAP -->
     <div class="map-wrapper">
       <div id="map-container"></div>
-      <!-- Detail Panel -->
-      <div class="detail-panel" id="detail-panel">
-        <!-- Populated dynamically -->
+
+      <!-- Floating legend -->
+      <div class="floating-legend" id="floating-legend">
+        <div class="fl-row"><span class="fl-dot" style="background:#22C55E"></span><span>Cooperative</span></div>
+        <div class="fl-row"><span class="fl-dot pulse-orange"></span><span>Dark (RF)</span></div>
+        <div class="fl-row"><span class="fl-dot pulse-amber"></span><span>Gone Dark</span></div>
       </div>
+
+      <!-- Detail Panel -->
+      <div class="detail-panel" id="detail-panel"></div>
     </div>
   </div>
 
-  <!-- ===== BOTTOM BAR ===== -->
+  <!-- BOTTOM BAR -->
   <footer class="bottombar">
-    <div class="bottombar-item">
-      <div class="bottombar-dot" style="background: var(--accent-ais)"></div>
-      <span>AIS Feed: Active</span>
-    </div>
-    <div class="bottombar-item">
-      <div class="bottombar-dot" style="background: var(--accent-rf)"></div>
-      <span>RF Sensors: Active</span>
-    </div>
-    <div class="bottombar-item">
-      <div class="bottombar-dot" style="background: var(--accent-sat)"></div>
-      <span>SAT Coverage: Active</span>
-    </div>
+    <div class="bottombar-item"><div class="bottombar-dot" style="background:#E8461E"></div><span>RF ELINT: Active</span></div>
+    <div class="bottombar-item"><div class="bottombar-dot" style="background:#22C55E"></div><span>AIS Feed: Active</span></div>
+    <div class="bottombar-item"><div class="bottombar-dot" style="background:#3B82F6"></div><span id="next-pass">Next SAR Pass: 14:22Z (ICEYE-X7)</span></div>
     <div class="bottombar-spacer"></div>
-    <div class="bottombar-item">
-      <span>Area: South China Sea / Western Pacific</span>
-    </div>
-    <div class="bottombar-item">
-      <span>Classification: UNCLASSIFIED // DEMO</span>
-    </div>
+    <div class="bottombar-item"><span>Strait of Hormuz / Persian Gulf</span></div>
+    <div class="bottombar-item"><span id="clock">--:--:--Z</span></div>
+    <div class="bottombar-item classification"><span>UNCLASSIFIED // DEMO</span></div>
   </footer>
 
-  <!-- App Scripts (order matters) -->
+  <!-- Scripts -->
   <script src="js/utils.js"></script>
   <script src="js/mock-data.js"></script>
   <script src="js/map.js"></script>

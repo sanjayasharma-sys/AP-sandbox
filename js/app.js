@@ -2,16 +2,15 @@
 
 window.appState = {
   vessels: [],
-  correlationGroups: {},
   selectedVessel: null,
-  lastUpdate: null
+  lastUpdate: null,
+  activePanel: null
 };
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Generate mock data
-  const { vessels, correlationGroups } = generateMockData();
+  // Generate scenario data
+  const { vessels } = generateScenarioData();
   window.appState.vessels = vessels;
-  window.appState.correlationGroups = correlationGroups;
   window.appState.lastUpdate = new Date();
 
   // Initialize components
@@ -19,14 +18,18 @@ document.addEventListener("DOMContentLoaded", () => {
   plotVessels(vessels);
   initFilters();
   initDashboard();
-  updateFilteredCounts();
+  initToolbar();
+
+  // Initial UI updates
+  updateStats();
   updateVesselList();
+  updateAlertFeed();
 
   // Start live clock
   updateClock();
   setInterval(updateClock, 1000);
 
-  // Simulated live updates - move vessels every 10 seconds
+  // Simulated live updates — move cooperative vessels every 10s
   setInterval(() => {
     updateVesselPositions(window.appState.vessels);
     updateMarkerPositions(window.appState.vessels);
@@ -39,58 +42,82 @@ document.addEventListener("DOMContentLoaded", () => {
     updateDashboard();
   }, 30000);
 
-  // Wire up the vessels tab search
-  const vesselSearchList = document.getElementById("vessel-search-list");
-  if (vesselSearchList) {
-    vesselSearchList.addEventListener("input", debounce((e) => {
-      filterState.searchQuery = e.target.value.toLowerCase().trim();
-      // Also sync the overview search
-      const mainSearch = document.getElementById("vessel-search");
-      if (mainSearch) mainSearch.value = e.target.value;
-      applyFilters();
-    }, 200));
-  }
-
   // Keyboard shortcuts
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") {
       closeDetailPanel();
+      closeActivePanel();
     }
   });
 
-  // Sidebar toggle for mobile
-  const sidebarToggle = document.getElementById("sidebar-toggle");
-  if (sidebarToggle) {
-    sidebarToggle.addEventListener("click", () => {
-      document.getElementById("sidebar").classList.toggle("open");
-    });
-  }
+  console.log(`uLook Maritime Intelligence initialized: ${vessels.length} vessels tracked`);
+});
 
-  // Tab switching in sidebar
-  document.querySelectorAll(".sidebar-tab").forEach(tab => {
-    tab.addEventListener("click", () => {
-      document.querySelectorAll(".sidebar-tab").forEach(t => t.classList.remove("active"));
-      document.querySelectorAll(".sidebar-panel").forEach(p => p.classList.remove("active"));
-      tab.classList.add("active");
-      const target = tab.dataset.tab;
-      document.getElementById(`panel-${target}`).classList.add("active");
+// ============ TOOLBAR ============
+
+function initToolbar() {
+  document.querySelectorAll(".toolbar-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const panelId = btn.dataset.panel;
+      if (!panelId) return;
+
+      // If same panel is open, close it
+      if (window.appState.activePanel === panelId) {
+        closeActivePanel();
+        return;
+      }
+
+      // Close any open panel, then open the new one
+      closeActivePanel();
+      openPanel(panelId);
     });
   });
 
-  console.log(`Maritime DA Dashboard initialized: ${vessels.length} tracks loaded`);
-});
+  // Panel close buttons
+  document.querySelectorAll(".panel-close").forEach(btn => {
+    btn.addEventListener("click", closeActivePanel);
+  });
+}
+
+function openPanel(panelId) {
+  const panel = document.getElementById(`panel-${panelId}`);
+  if (!panel) return;
+
+  panel.classList.add("open");
+  window.appState.activePanel = panelId;
+
+  // Update toolbar button active state
+  document.querySelectorAll(".toolbar-btn").forEach(b => b.classList.remove("active"));
+  const btn = document.querySelector(`.toolbar-btn[data-panel="${panelId}"]`);
+  if (btn) btn.classList.add("active");
+
+  // Refresh content for specific panels
+  if (panelId === "vessels") updateVesselList();
+  if (panelId === "alerts") updateAlertFeed();
+  if (panelId === "analytics") updateDashboard();
+}
+
+function closeActivePanel() {
+  if (!window.appState.activePanel) return;
+  const panel = document.getElementById(`panel-${window.appState.activePanel}`);
+  if (panel) panel.classList.remove("open");
+  document.querySelectorAll(".toolbar-btn").forEach(b => b.classList.remove("active"));
+  window.appState.activePanel = null;
+}
+
+// ============ CLOCK & STATUS ============
 
 function updateClock() {
-  const clockEl = document.getElementById("clock");
+  const clockEl = document.getElementById("navbar-clock");
   if (clockEl) {
     const now = new Date();
-    clockEl.textContent = now.toISOString().replace("T", " ").substring(0, 19) + "Z";
+    clockEl.textContent = now.toISOString().replace("T", " ").substring(11, 19) + "Z";
   }
 }
 
 function updateLastUpdateDisplay() {
   const el = document.getElementById("last-update");
   if (el && window.appState.lastUpdate) {
-    el.textContent = `Last update: ${timeAgo(window.appState.lastUpdate.toISOString())}`;
+    el.textContent = `Updated ${timeAgo(window.appState.lastUpdate.toISOString())}`;
   }
 }
