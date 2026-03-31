@@ -185,43 +185,88 @@ function plotVessels(vessels) {
 
     // Track history polyline
     if (vessel.trackHistory && vessel.trackHistory.length > 1) {
-      const modeColor = getTrackingModeColor(mode);
-      const latlngs = vessel.trackHistory.map(p => [p.lat, p.lng]);
-      const trackLine = L.polyline(latlngs, {
-        color: modeColor,
-        weight: 1.5,
-        opacity: 0.3,
-        dashArray: "4 6"
-      });
-      trackLine.addTo(layerGroups[mode]);
-      trackLines[vessel.id] = trackLine;
-    }
+      if (mode === "gone_dark" && vessel.ais && vessel.ais.lastSeen) {
+        // Split track into AIS (cooperative) and RF (uncooperative) segments
+        const lastSeenTime = new Date(vessel.ais.lastSeen).getTime();
+        const aisPoints = [];
+        const rfPoints = [];
 
-    // Ghost trail for gone_dark vessels
-    if (mode === "gone_dark" && vessel.ais && vessel.ais.lastSeen && vessel.ais.lastPosition) {
-      const lastPos = vessel.ais.lastPosition;
-      const ghostLine = L.polyline(
-        [[lastPos.lat, lastPos.lng], [vessel.lat, vessel.lng]],
-        {
-          color: "#F59E0B",
-          weight: 2,
-          opacity: 0.6,
-          dashArray: "6 4"
+        vessel.trackHistory.forEach(p => {
+          const t = new Date(p.timestamp).getTime();
+          if (t <= lastSeenTime) {
+            aisPoints.push([p.lat, p.lng]);
+          } else {
+            rfPoints.push([p.lat, p.lng]);
+          }
+        });
+
+        // Bridge: last AIS point is also the first RF point for continuity
+        if (aisPoints.length > 0 && rfPoints.length > 0) {
+          rfPoints.unshift(aisPoints[aisPoints.length - 1]);
         }
-      );
 
-      // Add arrow decorator at the endpoint
-      const arrowHead = L.circleMarker([vessel.lat, vessel.lng], {
-        radius: 3,
-        color: "#F59E0B",
-        fillColor: "#F59E0B",
-        fillOpacity: 0.8,
-        weight: 1
-      });
+        // AIS segment — cooperative green, solid
+        if (aisPoints.length > 1) {
+          const aisLine = L.polyline(aisPoints, {
+            color: "#22C55E",
+            weight: 2.5,
+            opacity: 0.7
+          });
+          aisLine.addTo(layerGroups[mode]);
+        }
 
-      ghostLine.addTo(layerGroups.gone_dark);
-      arrowHead.addTo(layerGroups.gone_dark);
-      ghostTrails[vessel.id] = ghostLine;
+        // RF segment — highlighted orange, glowing
+        if (rfPoints.length > 1) {
+          // Glow layer behind
+          const rfGlow = L.polyline(rfPoints, {
+            color: "#F59E0B",
+            weight: 8,
+            opacity: 0.15
+          });
+          rfGlow.addTo(layerGroups[mode]);
+
+          // Main RF track line
+          const rfLine = L.polyline(rfPoints, {
+            color: "#F59E0B",
+            weight: 3,
+            opacity: 0.9
+          });
+          rfLine.addTo(layerGroups[mode]);
+        }
+
+        // Transition marker — where AIS was lost
+        if (aisPoints.length > 0) {
+          const transitionPt = aisPoints[aisPoints.length - 1];
+          const transitionMarker = L.circleMarker(transitionPt, {
+            radius: 6,
+            color: "#EF4444",
+            fillColor: "#EF4444",
+            fillOpacity: 0.9,
+            weight: 2
+          });
+          transitionMarker.bindTooltip("AIS LOST", {
+            className: "dark-tooltip",
+            direction: "top",
+            offset: [0, -8],
+            permanent: false
+          });
+          transitionMarker.addTo(layerGroups[mode]);
+        }
+
+        trackLines[vessel.id] = true;
+      } else {
+        // Standard single-color track for cooperative / dark vessels
+        const modeColor = getTrackingModeColor(mode);
+        const latlngs = vessel.trackHistory.map(p => [p.lat, p.lng]);
+        const trackLine = L.polyline(latlngs, {
+          color: modeColor,
+          weight: 1.5,
+          opacity: 0.3,
+          dashArray: "4 6"
+        });
+        trackLine.addTo(layerGroups[mode]);
+        trackLines[vessel.id] = trackLine;
+      }
     }
   });
 }
