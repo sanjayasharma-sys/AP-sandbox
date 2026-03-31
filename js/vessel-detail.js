@@ -419,10 +419,11 @@ function renderImageryTab(vessel) {
     html += `
       <div class="detail-section">
         <h4>Imagery Timeline</h4>
+        <div class="imagery-count">${vessel.imagery.length} collection${vessel.imagery.length !== 1 ? "s" : ""}</div>
         <div class="imagery-timeline">
           ${vessel.imagery.map(img => {
-            const typeBadgeColor = img.type === "SAR" ? "#3B82F6" : "#F59E0B";
-            const typeBadgeBg = img.type === "SAR" ? "#3B82F620" : "#F59E0B20";
+            const typeBadgeColor = img.type === "SAR" ? "#06B6D4" : "#F59E0B";
+            const typeBadgeBg = img.type === "SAR" ? "rgba(6,182,212,0.15)" : "rgba(245,158,11,0.15)";
             let statusColor = "#6B7280";
             if (img.status === "acquired") statusColor = "#22C55E";
             else if (img.status === "processing") statusColor = "#F59E0B";
@@ -430,19 +431,48 @@ function renderImageryTab(vessel) {
 
             let detailLine = "";
             if (img.resolution) detailLine += `Res: ${img.resolution}`;
-            if (img.type === "EO" && img.cloudCover !== undefined) detailLine += ` | Cloud: ${img.cloudCover}%`;
+            if (img.type === "EO" && img.cloudCover !== undefined && img.cloudCover !== null) detailLine += ` &middot; Cloud: ${img.cloudCover}%`;
+
+            // Satellite imagery thumbnail
+            const thumbGradient = img.type === "SAR"
+              ? "linear-gradient(135deg, #0a1628 0%, #0d2040 30%, #14304a 50%, #0b1a30 70%, #091320 100%)"
+              : "linear-gradient(135deg, #1a2a18 0%, #2a3d25 30%, #1e3328 50%, #15281c 70%, #0d1a12 100%)";
+            const isTasked = img.status === "tasked";
+            const detectionDots = img.detections ? buildDetectionDots(img.detections, img.type) : "";
 
             return `
-              <div class="imagery-entry">
-                <div class="imagery-entry-header">
-                  <span class="imagery-satellite">${img.satellite || "Unknown"}</span>
-                  <span class="imagery-type-badge" style="background:${typeBadgeBg};color:${typeBadgeColor};border:1px solid ${typeBadgeColor}40">${img.type}</span>
+              <div class="imagery-card-full ${isTasked ? 'tasked' : ''}">
+                <div class="imagery-thumb" style="background:${thumbGradient}">
+                  ${isTasked ? `
+                    <div class="imagery-thumb-pending">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="10" stroke="${statusColor}" stroke-width="1.5" stroke-dasharray="4 3"/>
+                        <path d="M12 7v5l3 3" stroke="${statusColor}" stroke-width="1.5" stroke-linecap="round"/>
+                      </svg>
+                      <span>PENDING</span>
+                    </div>
+                  ` : `
+                    <div class="imagery-thumb-overlay">
+                      ${detectionDots}
+                      <div class="imagery-thumb-grid"></div>
+                    </div>
+                    <div class="imagery-thumb-label">${img.type}</div>
+                  `}
                 </div>
-                <div class="imagery-entry-meta">
-                  <span class="imagery-timestamp">${img.timestamp ? timeAgo(img.timestamp) : "Pending"}</span>
-                  <span class="imagery-status-badge" style="color:${statusColor}">${img.status.toUpperCase()}</span>
+                <div class="imagery-card-body">
+                  <div class="imagery-entry-header">
+                    <span class="imagery-satellite">${img.satellite || "Unknown"}</span>
+                    <span class="imagery-type-badge" style="background:${typeBadgeBg};color:${typeBadgeColor};border:1px solid ${typeBadgeColor}40">${img.type}</span>
+                  </div>
+                  <div class="imagery-entry-meta">
+                    <span class="imagery-timestamp">${img.timestamp ? timeAgo(img.timestamp) : "Pending"}</span>
+                    <span class="imagery-status-badge" style="color:${statusColor}">${img.status.toUpperCase()}</span>
+                  </div>
+                  ${img.location ? `<div class="imagery-location">${img.location}</div>` : ""}
+                  ${detailLine ? `<div class="imagery-entry-detail">${detailLine}</div>` : ""}
+                  ${img.notes ? `<div class="imagery-notes">${img.notes}</div>` : ""}
+                  ${img.detections ? `<div class="imagery-detections">${img.detections} detection${img.detections !== 1 ? "s" : ""}</div>` : ""}
                 </div>
-                ${detailLine ? `<div class="imagery-entry-detail">${detailLine}</div>` : ""}
               </div>
             `;
           }).join("")}
@@ -648,4 +678,23 @@ function renderHistoryTab(vessel) {
   }
 
   return html;
+}
+
+// ============ IMAGERY HELPERS ============
+
+function buildDetectionDots(count, type) {
+  const color = type === "SAR" ? "#06B6D4" : "#F59E0B";
+  const positions = [
+    { top: "30%", left: "55%" },
+    { top: "50%", left: "35%" },
+    { top: "25%", left: "70%" },
+    { top: "65%", left: "60%" },
+    { top: "45%", left: "20%" }
+  ];
+  let dots = "";
+  for (let i = 0; i < Math.min(count, positions.length); i++) {
+    const p = positions[i];
+    dots += `<div class="imagery-detection-marker" style="top:${p.top};left:${p.left};border-color:${color}"></div>`;
+  }
+  return dots;
 }

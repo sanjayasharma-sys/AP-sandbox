@@ -331,13 +331,76 @@ function generateScenarioData() {
       },
       imagery: [
         {
-          id: "IMG-005",
+          id: "IMG-005a",
+          type: "EO",
+          satellite: "Pleiades Neo",
+          timestamp: new Date(now.getTime() - 29 * 24 * 3600000).toISOString(),
+          resolution: "0.3m",
+          cloudCover: 8,
+          status: "acquired",
+          location: "Bandar Abbas Port",
+          notes: "Vessel identified alongside berth at Shahid Rajaee terminal. Cargo operations observed.",
+          detections: 3
+        },
+        {
+          id: "IMG-005b",
+          type: "SAR",
+          satellite: "ICEYE-X7",
+          timestamp: new Date(now.getTime() - 16 * 24 * 3600000).toISOString(),
+          resolution: "1m",
+          cloudCover: null,
+          status: "acquired",
+          location: "Bandar Abbas Anchorage",
+          notes: "SAR detection of vessel at anchorage with two unidentified contacts within 500m. Possible STS transfer.",
+          detections: 4
+        },
+        {
+          id: "IMG-005c",
+          type: "EO",
+          satellite: "Planet SkySat",
+          timestamp: new Date(now.getTime() - 12 * 24 * 3600000).toISOString(),
+          resolution: "0.5m",
+          cloudCover: 22,
+          status: "acquired",
+          location: "Strait of Hormuz",
+          notes: "Vessel underway in outbound TSS lane. AIS active at time of collection.",
+          detections: 1
+        },
+        {
+          id: "IMG-005d",
+          type: "SAR",
+          satellite: "Capella-6",
+          timestamp: new Date(now.getTime() - 5 * 24 * 3600000).toISOString(),
+          resolution: "0.5m",
+          cloudCover: null,
+          status: "acquired",
+          location: "Persian Gulf — Jebel Ali approach",
+          notes: "Vessel inbound to Jebel Ali port. Confirmed identity via RF correlation.",
+          detections: 1
+        },
+        {
+          id: "IMG-005e",
           type: "SAR",
           satellite: "Sentinel-1A",
           timestamp: new Date(now.getTime() - 3 * 3600000).toISOString(),
           resolution: "5m",
           cloudCover: null,
-          status: "acquired"
+          status: "acquired",
+          location: "Strait of Hormuz — TSS",
+          notes: "Post-AIS-loss detection. Vessel heading NE through strait. RF emitter correlation confirms identity.",
+          detections: 2
+        },
+        {
+          id: "IMG-005f",
+          type: "SAR",
+          satellite: "ICEYE-X12",
+          timestamp: null,
+          resolution: "1m",
+          cloudCover: null,
+          status: "tasked",
+          location: "Current vessel position",
+          notes: "Priority tasking requested — vessel operating dark.",
+          detections: null
         }
       ],
       alerts: [
