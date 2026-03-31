@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 130" fill="#E8461E">
+  <!-- U -->
+  <path d="M0,10 L0,80 Q0,125 45,125 L50,125 Q95,125 95,80 L95,10 L70,10 L70,78 Q70,100 47.5,100 Q25,100 25,78 L25,10 Z"/>
+  <!-- L -->
+  <path d="M110,10 L110,125 L185,125 L185,102 L135,102 L135,10 Z"/>
+  <!-- O with wave (first) -->
+  <circle cx="240" cy="67" r="58" fill="#E8461E"/>
+  <path d="M182,67 Q200,45 215,67 Q230,89 248,67 Q266,45 280,67 Q296,89 298,67" stroke="white" stroke-width="14" fill="none" stroke-linecap="round"/>
+  <!-- O with wave (second) -->
+  <circle cx="355" cy="67" r="58" fill="#E8461E"/>
+  <path d="M297,67 Q315,45 330,67 Q345,89 363,67 Q381,45 395,67 Q411,89 413,67" stroke="white" stroke-width="14" fill="none" stroke-linecap="round"/>
+  <!-- K -->
+  <path d="M430,10 L430,125 L455,125 L455,78 L493,125 L525,125 L480,72 L520,10 L492,10 L465,55 L455,43 L455,10 Z"/>
+</svg>
